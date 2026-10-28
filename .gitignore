@@ -1,0 +1,9 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# macOS
+.DS_Store
+
+# Local document unrelated to the game
+/ERRO SOLUM X SAP.docx
