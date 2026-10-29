@@ -2,6 +2,12 @@
 .godot/
 /android/
 
+# Traduções geradas pelo Godot
+*.translation
+
+# Exportações do jogo
+/builds/
+
 # macOS
 .DS_Store
 
