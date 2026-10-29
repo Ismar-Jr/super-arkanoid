@@ -15,7 +15,8 @@ extends CharacterBody2D
 # Valores positivos representam movimento para a direita.
 # Uma das velocidades será escolhida aleatoriamente.
 @export var angle = [-200, -250, 250, 300]
-
+@export var drop_probability = 0.2 # probabilidade de 20% de gerar um item
+@export var item_scene = preload("res://Scenes/item_power_up.tscn")
 
 # Executada automaticamente em intervalos fixos de física.
 # delta representa o tempo decorrido entre atualizações.
@@ -71,6 +72,8 @@ func _physics_process(delta):
 				# queue_free() não remove imediatamente:
 				# o objeto é liberado ao final do frame.
 				collided_object.queue_free()
+				spawn_item(collision.get_position())
+				
 
 
 # Função responsável por iniciar o jogo
@@ -92,3 +95,12 @@ func play_game():
 	# O resultado é um movimento inicial para cima,
 	# com direção horizontal variável.
 	velocity = Vector2(angle.pick_random(), y_speed)
+	
+func spawn_item(position_item : Vector2):
+	#sorteara se havera a geracao de um item coletavel
+	if randf() < drop_probability:
+		#criar o item coletável
+		var item = item_scene.instantiate() #instancia o item coletavel
+		item.position = position_item #define a posicao do item coletavel
+		get_parent().add_child(item) #adicione o item a cena
+		
