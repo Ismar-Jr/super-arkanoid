@@ -1,106 +1,72 @@
 
-# Herda CharacterBody2D, que permite movimentar
-# objetos 2D e detectar colisões físicas.
 extends CharacterBody2D
 
-
-# Define a velocidade vertical inicial.
-# Valores negativos movimentam o objeto para cima.
-# @export permite alterar o valor pelo Inspector do Godot.
+# Velocidade vertical inicial da bola (negativo = para cima).
 @export var y_speed = -250
 
-
-# Lista de velocidades horizontais possíveis.
-# Valores negativos representam movimento para a esquerda.
-# Valores positivos representam movimento para a direita.
-# Uma das velocidades será escolhida aleatoriamente.
+# Velocidades horizontais possíveis para o lançamento.
 @export var angle = [-200, -250, 250, 300]
-@export var drop_probability = 0.2 # probabilidade de 20% de gerar um item
+
+# Chance de 20% de gerar um item ao destruir um bloco.
+@export var drop_probability = 0.2
+
+# Carrega antecipadamente a cena do item coletável.
 @export var item_scene = preload("res://Scenes/item_power_up.tscn")
 
-# Executada automaticamente em intervalos fixos de física.
-# delta representa o tempo decorrido entre atualizações.
+
+# Executada a cada atualização de física.
 func _physics_process(delta):
 
-	# Verifica se a ação "Start" está pressionada
-	# e se o jogo ainda não foi iniciado.
-	#
-	# GameManager é um script global (Autoload)
-	# que armazena o estado de início do jogo.
+	# Inicia o jogo quando Start é pressionado.
 	if Input.is_action_pressed("Start") and !GameManager.started:
 		play_game()
 
-	# Permite movimentar o objeto somente
-	# depois que o jogo tiver sido iniciado.
+	# A bola só se movimenta depois que o jogo começa.
 	if GameManager.started:
 
-		# Movimenta o objeto conforme sua velocidade.
-		# Multiplicar por delta ajusta o deslocamento
-		# ao tempo decorrido entre atualizações.
-		#
-		# move_and_collide() retorna informações
-		# sobre a colisão, caso alguma aconteça.
-		# Se não houver colisão, retorna null.
+		# Move a bola e retorna os dados da colisão, se houver.
+		# delta ajusta o deslocamento ao tempo do passo de física.
 		var collision = move_and_collide(velocity * delta)
 
-		# Verifica se aconteceu alguma colisão.
 		if collision != null:
 
-			# Calcula a nova direção após a colisão.
-			#
-			# get_normal() retorna o vetor normal
-			# da superfície atingida.
-			#
-			# bounce() reflete a velocidade atual
-			# em relação a essa normal, produzindo
-			# o efeito de quicar.
+			# Reflete a velocidade usando a normal da superfície atingida.
 			velocity = velocity.bounce(collision.get_normal())
 
-			# Obtém a referência ao objeto
-			# com o qual ocorreu a colisão.
+			# Identifica o objeto atingido pela bola.
 			var collided_object = collision.get_collider()
 
-			# Verifica se o nome do objeto atingido
-			# contém a palavra "Block".
-			#
-			# Isso permite identificar os blocos
-			# que podem ser destruídos pela bola.
+			# Verifica se o objeto é um bloco destrutível.
 			if "Block" in collided_object.name:
 
-				# Agenda a remoção do bloco da cena.
-				#
-				# queue_free() não remove imediatamente:
-				# o objeto é liberado ao final do frame.
+				# Agenda a remoção do bloco ao final do frame.
 				collided_object.queue_free()
+
+				# Tenta gerar um item na posição da colisão.
 				spawn_item(collision.get_position())
-				
 
 
-# Função responsável por iniciar o jogo
-# e definir a velocidade inicial do objeto.
+# Inicia a partida e define a velocidade inicial da bola.
 func play_game():
 
-	# Atualiza o estado global do jogo.
-	#
-	# Como started pertence ao GameManager,
-	# outros scripts também podem consultar
-	# se o jogo já foi iniciado.
+	# Atualiza o estado global da partida (Autoload).
 	GameManager.started = true
 
-	# Define a velocidade inicial em dois eixos:
-	#
-	# X: escolhe aleatoriamente um valor de angle.
-	# Y: utiliza o valor definido em y_speed.
-	#
-	# O resultado é um movimento inicial para cima,
-	# com direção horizontal variável.
+	# Sorteia a velocidade horizontal e aplica a vertical.
 	velocity = Vector2(angle.pick_random(), y_speed)
-	
-func spawn_item(position_item : Vector2):
-	#sorteara se havera a geracao de um item coletavel
+
+
+# Tenta criar um item coletável na posição informada.
+func spawn_item(position_item: Vector2):
+
+	# randf() sorteia um número entre 0 e 1.
 	if randf() < drop_probability:
-		#criar o item coletável
-		var item = item_scene.instantiate() #instancia o item coletavel
-		item.position = position_item #define a posicao do item coletavel
-		get_parent().add_child(item) #adicione o item a cena
-		
+
+		# Cria uma instância da cena do coletável.
+		var item = item_scene.instantiate()
+
+		# Define a posição inicial do item.
+		item.position = position_item
+
+		# Adiciona o coletável à cena, como irmão da bola.
+		get_parent().add_child(item)

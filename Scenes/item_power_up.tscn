@@ -8,6 +8,8 @@ radius = 13.0
 
 [node name="Item Power Up" type="CharacterBody2D" unique_id=1150142654]
 position = Vector2(320, 4)
+collision_layer = 8
+collision_mask = 65
 script = ExtResource("1_tnius")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1784716369]
