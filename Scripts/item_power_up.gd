@@ -28,9 +28,7 @@ func _physics_process(delta: float) -> void:
 
 		# Verifica se o nome do objeto contém "Player".
 		if collision_object.name == "Player":
+			GameManager.on_powerup.emit() #a godot sabe quando o sinal será emitido
 
 			# Agenda a remoção do item após a coleta.
 			queue_free()
-
-			# Exibe uma mensagem de teste no console do Godot.
-			print("ativado")
