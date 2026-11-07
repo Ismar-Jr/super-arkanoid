@@ -10,7 +10,6 @@
 [ext_resource type="Texture2D" uid="uid://n728lilgq28y" path="res://Sprites/GrayBlock.png" id="7_uy8f0"]
 [ext_resource type="Texture2D" uid="uid://b7dck7slhfg1p" path="res://Sprites/GreenBlock.png" id="8_6r07y"]
 [ext_resource type="Texture2D" uid="uid://ccg3uv2318kgx" path="res://Sprites/PurpleBlock.png" id="9_6ioyp"]
-[ext_resource type="PackedScene" uid="uid://pa7d52mpk5bo" path="res://Scenes/item_power_up.tscn" id="11_af3po"]
 
 [node name="Level1" type="Node2D" unique_id=1050661834]
 
@@ -384,5 +383,3 @@ position = Vector2(560, 168)
 [node name="Sprite2D" type="Sprite2D" parent="Blocks/Red/Block8" unique_id=1249801127]
 texture = ExtResource("5_6444e")
 centered = false
-
-[node name="Item Power Up" parent="." unique_id=1150142654 instance=ExtResource("11_af3po")]

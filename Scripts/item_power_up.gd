@@ -7,7 +7,6 @@ extends CharacterBody2D
 # Velocidade de rotação do item, em graus por segundo.
 @export var rotation_speed: float = 60.0
 
-
 # Atualiza a movimentação e a rotação a cada passo de física.
 func _physics_process(delta: float) -> void:
 
