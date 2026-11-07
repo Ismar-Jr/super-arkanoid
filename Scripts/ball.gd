@@ -49,7 +49,10 @@ func spawn_item(position_item: Vector2):
 
 			# Inicia o intervalo entre power-ups.
 			timer_item_power_up.start()
-
-	# Exibe o estado e o tempo restante para depuração.
-	print("Timer parado: ", timer_item_power_up.is_stopped(),
-		" | Tempo restante: ", timer_item_power_up.time_left)
+func reset_position():
+	var player = get_parent().get_node("Player")
+	position = player.position + Vector2(0, -25)
+	GameManager.started = false
+	
+	
+	

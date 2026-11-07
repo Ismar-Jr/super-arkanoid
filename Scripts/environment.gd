@@ -10,7 +10,12 @@ func _on_death_zone_body_entered(body: Node2D) -> void:
 
 	# Se for a bola, inicia a contagem para reiniciar o jogo.
 	if body.name == "Ball":
-		timer_reset.start()
+		if GameManager.lives > 1:
+			GameManager.lives -=1
+			body.reset_position()
+			
+		else:
+			timer_reset.start() #se nao for bola o objeto é deletado
 
 	# Outros objetos, como itens não coletados, são removidos.
 	else:
@@ -21,7 +26,10 @@ func _on_death_zone_body_entered(body: Node2D) -> void:
 func _on_timer_reset_timeout() -> void:
 
 	# Marca a partida como não iniciada no GameManager (Autoload).
+	print("Game Over!")
+
 	GameManager.started = false
+	GameManager.lives = 3
 
 	# Recarrega a cena atual, restaurando o cenário inicial.
 	get_tree().reload_current_scene()

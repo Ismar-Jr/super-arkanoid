@@ -26,7 +26,7 @@ func _ready():
 
 # Atualiza a movimentação a cada passo de física.
 func _physics_process(delta):
-
+	print("Você tem: ", GameManager.lives, " Vidas")
 	# Zera a velocidade horizontal quando não há movimento.
 	velocity.x = 0
 
