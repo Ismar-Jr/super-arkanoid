@@ -6,7 +6,8 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_rinpn"]
 
 [node name="Bullet" type="Area2D" unique_id=206515040]
-position = Vector2(324, 441)
+collision_layer = 16
+collision_mask = 4
 script = ExtResource("1_jb3vm")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1818459340]
@@ -14,3 +15,5 @@ texture = ExtResource("2_3w4em")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=364977135]
 shape = SubResource("CircleShape2D_rinpn")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
