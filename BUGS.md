@@ -1,4 +1,4 @@
-﻿# Registro de Bugs — Super Arkanoid
+# Registro de Bugs — Super Arkanoid
 
 Documento destinado ao registro e acompanhamento de bugs.
 
@@ -65,4 +65,3 @@ antes de executar sua movimentação e suas colisões.
 #### Decisão
 Não corrigir agora. Continuar o desenvolvimento normal.
 Reavaliar durante a etapa de depuração.
-
