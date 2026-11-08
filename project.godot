@@ -11,20 +11,24 @@ config_version=5
 [application]
 
 config/name="Super Arkanoid"
-run/main_scene="uid://c46bve84g2v7v"
-config/features=PackedStringArray("4.7", "Mobile")
+run/main_scene="res://Scenes/UI/main_menu.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
+
+[audio]
+
+buses/default_bus_layout="uid://imxf73mmumqm"
 
 [autoload]
 
-GameManager="*uid://b3qa17x0wstp1"
+GameManager="*res://Scripts/game_manager.gd"
+AudioManager="*res://Scenes/audio_manager.tscn"
 
 [display]
 
-window/size/viewport_width=640
-window/size/viewport_height=480
-window/stretch/mode="canvas_items"
-window/stretch/aspect="expand"
+window/size/viewport_width=960
+window/size/viewport_height=576
+window/stretch/mode="viewport"
 
 [dotnet]
 
@@ -66,5 +70,8 @@ Start={
 
 [rendering]
 
+textures/canvas_textures/default_texture_filter=0
 rendering_device/driver.windows="d3d12"
-renderer/rendering_method="mobile"
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.027, 0.039, 0.09, 1)

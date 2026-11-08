@@ -1,35 +1,59 @@
 
 extends Node2D
 
-# Referência ao temporizador responsável por reiniciar a partida.
-@onready var timer_reset = $TimerReset
+# Solicita o reposicionamento após a perda de uma vida.
+signal respawn_requested
+
+@onready var timer_reset: Timer = $TimerReset
+
+# Controla a animação das luzes da arena.
+var ambient_time: float = 0.0
 
 
-# Chamada quando um corpo entra na zona de morte.
+func _ready() -> void:
+	# Monitora as mudanças de estado da partida.
+	GameManager.state_changed.connect(_on_state_changed)
+
+
+func _process(delta: float) -> void:
+	# Atualiza a animação das luzes.
+	ambient_time += delta
+	queue_redraw()
+
+
+func _draw() -> void:
+	# Desenha luzes pulsantes nas laterais da arena.
+	for index in range(8):
+		var brightness := 0.15 + 0.15 * sin(ambient_time * 1.4 + index)
+
+		draw_rect(Rect2(3, 208 + index * 28, 2, 8), Color(0.3, 0.9, 0.9, brightness))
+		draw_rect(Rect2(635, 208 + index * 28, 2, 8), Color(0.3, 0.9, 0.9, brightness))
+
+
 func _on_death_zone_body_entered(body: Node2D) -> void:
-
-	# Se for a bola, inicia a contagem para reiniciar o jogo.
 	if body.name == "Ball":
-		if GameManager.lives > 1:
-			GameManager.lives -=1
-			body.reset_position()
-			
-		else:
-			timer_reset.start() #se nao for bola o objeto é deletado
+		# Registra a perda e interrompe a bola.
+		if GameManager.lose_life():
+			body.velocity = Vector2.ZERO
+			body.visible = false
 
-	# Outros objetos, como itens não coletados, são removidos.
+			# Inicia a reposição se ainda houver vidas.
+			if GameManager.lives > 0:
+				timer_reset.start()
 	else:
+		# Remove itens que ultrapassaram a arena.
 		body.queue_free()
 
 
-# Chamada quando o temporizador termina sua contagem.
 func _on_timer_reset_timeout() -> void:
+	if GameManager.state == GameManager.State.READY and GameManager.lives > 0:
+		# Reposiciona os atores e libera o próximo lançamento.
+		respawn_requested.emit()
+		GameManager.ready_locked = false
+		GameManager.state_changed.emit(GameManager.state)
 
-	# Marca a partida como não iniciada no GameManager (Autoload).
-	print("Game Over!")
 
-	GameManager.started = false
-	GameManager.lives = 3
-
-	# Recarrega a cena atual, restaurando o cenário inicial.
-	get_tree().reload_current_scene()
+func _on_state_changed(value: int) -> void:
+	# Cancela a reposição ao sair da partida.
+	if value in [GameManager.State.MAIN_MENU, GameManager.State.GAME_OVER]:
+		timer_reset.stop()

@@ -1,0 +1,17 @@
+[remap]
+
+importer="font_data_bmfont"
+type="FontFile"
+uid="uid://cl81xciqjvbsm"
+path="res://.godot/imported/arcade.fnt-79784c93a1935b7f8c2f74a412ad7900.fontdata"
+
+[deps]
+
+source_file="res://Assets/16bit/arcade.fnt"
+dest_files=["res://.godot/imported/arcade.fnt-79784c93a1935b7f8c2f74a412ad7900.fontdata"]
+
+[params]
+
+fallbacks=[]
+compress=true
+scaling_mode=2

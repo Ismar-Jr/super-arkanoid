@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b61k0ahsd1rlt"]
 
-[ext_resource type="Texture2D" uid="uid://d3nit432u04i8" path="res://Sprites/Background.png" id="1_km3fo"]
+[ext_resource type="Texture2D" path="res://Assets/16bit/arena.png" id="1_km3fo"]
 [ext_resource type="Script" uid="uid://11a7skfyir8n" path="res://Scripts/environment.gd" id="1_mfu5p"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_e7vb0"]

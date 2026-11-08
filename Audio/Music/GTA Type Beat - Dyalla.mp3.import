@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://cls4nep4w8sjf"
+path="res://.godot/imported/GTA Type Beat - Dyalla.mp3-9db8c1c5be4800edff3d51e1e4f5d39d.mp3str"
+
+[deps]
+
+source_file="res://Audio/Music/GTA Type Beat - Dyalla.mp3"
+dest_files=["res://.godot/imported/GTA Type Beat - Dyalla.mp3-9db8c1c5be4800edff3d51e1e4f5d39d.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

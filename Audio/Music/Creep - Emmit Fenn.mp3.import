@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://th3xua8kb382"
+path="res://.godot/imported/Creep - Emmit Fenn.mp3-e3acee1b7b47c74677361638f6d0bf8f.mp3str"
+
+[deps]
+
+source_file="res://Audio/Music/Creep - Emmit Fenn.mp3"
+dest_files=["res://.godot/imported/Creep - Emmit Fenn.mp3-e3acee1b7b47c74677361638f6d0bf8f.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

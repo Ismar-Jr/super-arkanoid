@@ -4,14 +4,18 @@
 [ext_resource type="PackedScene" uid="uid://cp8dtwfdki8yx" path="res://Scenes/player.tscn" id="2_7p6j4"]
 [ext_resource type="PackedScene" uid="uid://cgcoumllvd110" path="res://Scenes/ball.tscn" id="3_6444e"]
 [ext_resource type="PackedScene" uid="uid://co1jhbsbvvq7w" path="res://Scenes/block.tscn" id="4_7p6j4"]
-[ext_resource type="Texture2D" uid="uid://c74upwkiabsej" path="res://Sprites/RedBlock.png" id="5_6444e"]
-[ext_resource type="Texture2D" uid="uid://dvedv87gdpuyc" path="res://Sprites/YellowBlock.png" id="5_chwpn"]
-[ext_resource type="Texture2D" uid="uid://n2vm675on7oq" path="res://Sprites/BlueBlock.png" id="6_af3po"]
-[ext_resource type="Texture2D" uid="uid://n728lilgq28y" path="res://Sprites/GrayBlock.png" id="7_uy8f0"]
-[ext_resource type="Texture2D" uid="uid://b7dck7slhfg1p" path="res://Sprites/GreenBlock.png" id="8_6r07y"]
-[ext_resource type="Texture2D" uid="uid://ccg3uv2318kgx" path="res://Sprites/PurpleBlock.png" id="9_6ioyp"]
+[ext_resource type="Texture2D" path="res://Assets/16bit/block_red.png" id="5_6444e"]
+[ext_resource type="Texture2D" path="res://Assets/16bit/block_yellow.png" id="5_chwpn"]
+[ext_resource type="Texture2D" path="res://Assets/16bit/block_blue.png" id="6_af3po"]
+[ext_resource type="Texture2D" path="res://Assets/16bit/block_gray.png" id="7_uy8f0"]
+[ext_resource type="Texture2D" path="res://Assets/16bit/block_green.png" id="8_6r07y"]
+[ext_resource type="Texture2D" path="res://Assets/16bit/block_purple.png" id="9_6ioyp"]
+
+[ext_resource type="Script" path="res://Scripts/level.gd" id="11"]
 
 [node name="Level1" type="Node2D" unique_id=1050661834]
+
+script = ExtResource("11")
 
 [node name="Environment" parent="." unique_id=1529760400 instance=ExtResource("1_xfk5q")]
 
@@ -25,13 +29,11 @@ position = Vector2(320, 413)
 position = Vector2(0, -24)
 
 [node name="Yellow" type="Node2D" parent="Blocks" unique_id=1530572491]
-position = Vector2(0, 24)
 
 [node name="Block41" parent="Blocks/Yellow" unique_id=2035117826 instance=ExtResource("4_7p6j4")]
 position = Vector2(560, 72)
 
 [node name="Sprite2D" type="Sprite2D" parent="Blocks/Yellow/Block41" unique_id=1460804118]
-position = Vector2(0, -24)
 texture = ExtResource("5_chwpn")
 centered = false
 
@@ -39,7 +41,6 @@ centered = false
 position = Vector2(480, 72)
 
 [node name="Sprite2D" type="Sprite2D" parent="Blocks/Yellow/Block42" unique_id=1102733886]
-position = Vector2(0, -24)
 texture = ExtResource("5_chwpn")
 centered = false
 
@@ -47,7 +48,6 @@ centered = false
 position = Vector2(400, 72)
 
 [node name="Sprite2D" type="Sprite2D" parent="Blocks/Yellow/Block43" unique_id=1082530042]
-position = Vector2(0, -24)
 texture = ExtResource("5_chwpn")
 centered = false
 
@@ -55,7 +55,6 @@ centered = false
 position = Vector2(320, 72)
 
 [node name="Sprite2D" type="Sprite2D" parent="Blocks/Yellow/Block44" unique_id=1028147047]
-position = Vector2(0, -24)
 texture = ExtResource("5_chwpn")
 centered = false
 
@@ -63,7 +62,6 @@ centered = false
 position = Vector2(240, 72)
 
 [node name="Sprite2D" type="Sprite2D" parent="Blocks/Yellow/Block45" unique_id=332771170]
-position = Vector2(0, -24)
 texture = ExtResource("5_chwpn")
 centered = false
 
@@ -71,7 +69,6 @@ centered = false
 position = Vector2(160, 72)
 
 [node name="Sprite2D" type="Sprite2D" parent="Blocks/Yellow/Block46" unique_id=487426970]
-position = Vector2(0, -24)
 texture = ExtResource("5_chwpn")
 centered = false
 
@@ -79,7 +76,6 @@ centered = false
 position = Vector2(80, 72)
 
 [node name="Sprite2D" type="Sprite2D" parent="Blocks/Yellow/Block47" unique_id=220697148]
-position = Vector2(0, -24)
 texture = ExtResource("5_chwpn")
 centered = false
 
@@ -87,7 +83,6 @@ centered = false
 position = Vector2(0, 72)
 
 [node name="Sprite2D" type="Sprite2D" parent="Blocks/Yellow/Block48" unique_id=589336971]
-position = Vector2(0, -24)
 texture = ExtResource("5_chwpn")
 centered = false
 
@@ -151,7 +146,6 @@ texture = ExtResource("6_af3po")
 centered = false
 
 [node name="Gray" type="Node2D" parent="Blocks" unique_id=657810742]
-visible = false
 position = Vector2(0, -48)
 
 [node name="Block25" parent="Blocks/Gray" unique_id=759153081 instance=ExtResource("4_7p6j4")]
