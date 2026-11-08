@@ -1,78 +1,68 @@
-# Super Arkanoid — Orbital Defense
+# Super Pinball — Orbital Reactor
 
-Laboratório visual de arcade 16-bit em Godot 4.7, na branch `codex/redesign-16bit`.
+Pinball 16-bit em Godot 4.7, na branch experimental `codex/pinball`, derivada de `codex/redesign-16bit`.
 
-## Executar
+## Jogar
 
-1. Importe `project.godot` no Godot 4.7 ou versão compatível.
+1. Abra `project.godot` no Godot 4.7 ou versão compatível.
 2. Aguarde a importação dos recursos e pressione **F5**.
-3. Escolha **INICIAR JOGO** e pressione **Espaço** para lançar a bola.
+3. Escolha **INICIAR JOGO**. Segure **Espaço** para carregar o lançador e solte para jogar a bola.
 
-A apresentação usa 960 × 576, com a arena física original de 640 × 480 e um console lateral. A janela preserva a proporção, com filtragem nearest para pixel art.
-
-## Controles
-
-| Ação | Controle |
+| Controle | Ação |
 | --- | --- |
-| Mover plataforma | A / D ou setas esquerda / direita |
-| Lançar bola / nova tentativa | Espaço |
-| Navegar nos menus | Setas ou Tab, Enter / Espaço, mouse |
-| Retornar ao menu | Esc durante a partida |
-| Fechar o manual | Esc ou VOLTAR |
+| A / seta esquerda | Acionar o flipper esquerdo |
+| D / seta direita | Acionar o flipper direito |
+| Segurar e soltar Espaço | Carregar e liberar o lançador |
+| Esc | Retornar ao menu; fechar o manual |
+| Mouse, setas, Tab e Enter | Navegar pelas telas |
 
-Cada bloco vale **100 pontos**. A partida começa com **3 vidas**; uma queda preserva os blocos restantes e o placar, com 2 segundos de reposição. Ao limpar os 48 blocos, o próximo setor repete a formação, preservando vidas e pontuação. O recorde é salvo em `user://records.cfg`.
+## A mesa
 
-O módulo laser mantém a regra original: 20% de chance por bloco destruído pela bola, intervalo mínimo de 15 segundos, 16 tiros automáticos em 8 duplas, a cada 0,2 segundo.
+Três bumpers alimentam o reator, três alvos superiores formam uma bancada de bônus e duas borrachas triangulares devolvem a esfera para o centro. Trilhos cromados, saídas laterais e uma abertura entre os flippers permitem perder a bola. Cada partida tem **três bolas**.
+
+| Evento | Pontos base |
+| --- | ---: |
+| Bumper | 100 |
+| Alvo superior, uma vez até reiniciar a bancada | 250 |
+| Borracha triangular | 50 |
+| Acender os três alvos | 1.000 de bônus |
+| Cinco ativações de bumpers | 500 de bônus e próximo multiplicador |
+
+O multiplicador começa em **1x** e chega a **5x**. Pontuação, luzes e multiplicador permanecem entre bolas. A reposição leva 1,2 segundo e reutiliza a mesma esfera. Se ela retornar ao canal de lançamento, poderá ser relançada sem perder outra bola.
+
+O recorde é salvo em `user://pinball_records.cfg`, separado do Arkanoid. O menu inclui volumes independentes de música e efeitos, persistidos em `user://audio.cfg`. As faixas e efeitos escolhidos na versão anterior foram mantidos.
 
 ## Estrutura
 
-- `Scenes/main.tscn`: composição da arena e do HUD.
-- `Scenes/level_1.tscn`: formação original, atores e colisões.
-- `Scenes/UI/`: menu, HUD e Game Over reutilizáveis.
-- `Scripts/game_manager.gd`: estados, pontuação, vidas e recorde.
-- `Scripts/level.gd`: tentativas, limpeza de efeitos e setores.
-- `Scripts/UI/`, `Scripts/Effects/`: interface e efeitos.
-- `Assets/16bit/`: PNGs e fonte bitmap originais.
-- `Tools/generate_art.py`: gerador determinístico, somente Python padrão.
-- `Tests/smoke_test.gd`: regressão de integração executada no Godot.
-- `Docs/REDESIGN_16BIT.md`: decisões, inventário e validação.
+- `Scenes/Pinball/pinball.tscn`: mesa principal e HUD.
+- `Scenes/Pinball/{ball,flipper,bumper,target}.tscn`: peças reutilizáveis.
+- `Scripts/Pinball/`: física, regras da mesa, geometria e efeitos de pontuação.
+- `Scripts/game_manager.gd`: estados, três bolas, multiplicador, reator e recorde.
+- `Scripts/UI/`: menu, manual, console e Game Over.
+- `Assets/Pinball/`: sete PNGs originais e mapeamento visual da mesa.
+- `Tools/generate_pinball_art.py`: gerador local, usando apenas Python padrão.
+- `Tests/pinball_test.gd`: regressão de integração do pinball.
+- `Docs/PINBALL.md`: decisões de física, inventário e validação.
 
-Os sprites anteriores continuam em `Sprites/`. O cache `.godot/` é recriado pelo editor.
-
-## Música e efeitos
-
-O jogo inclui duas músicas originais em loop (menu e partida) e dez efeitos retrô para interface, lançamento, rebotes, blocos, laser, coleta, perda de vida, conclusão de setor e Game Over.
-
-Os controles **MÚSICA** e **EFEITOS** ficam no rodapé do menu e aceitam mouse ou Tab + setas. Arraste até zero para silenciar um canal. Os volumes são salvos em `user://audio.cfg`, separados do recorde.
-
-- `Scenes/audio_manager.tscn` e `Scripts/audio_manager.gd`: Autoload de reprodução e preferências.
-- `default_bus_layout.tres`: canais Master, Music e SFX, com limite de saída.
-- `Audio/Music/` e `Audio/SFX/`: arquivos WAV originais, prontos para substituir.
-- `Tools/generate_audio.py`: composição e síntese reproduzíveis, somente Python padrão.
-- `Audio/README.md`: inventário, importação, loops e substituição dos arquivos.
-
-A música da partida continua entre tentativas e setores. O Game Over interrompe a faixa e toca sua vinheta. Os efeitos de blocos e itens terminam mesmo após esses objetos serem removidos.
-
-Para regenerar os áudios originais:
-
-```sh
-python3 Tools/generate_audio.py
-```
+Os recursos e cenas anteriores continuam disponíveis como referência. O projeto inicia no pinball nesta branch; o Arkanoid permanece na branch `codex/redesign-16bit`.
 
 ## Recriar a arte
 
 ```sh
-python3 Tools/generate_art.py
+python3 Tools/generate_pinball_art.py
 ```
 
-## Validar a integração
+Esse gerador escreve somente em `Assets/Pinball/`, reaproveitando as primitivas de desenho do gerador anterior.
+
+## Validar
 
 ```sh
-godot --headless --path . --script Tests/smoke_test.gd
+godot --headless --path . --script Tests/pinball_test.gd
 godot --headless --path . --script Tests/quit_test.gd
-godot --headless --path . --script Tests/audio_test.gd
 ```
 
-Validado no Godot 4.7.2: **59 verificações do jogo e 50 de áudio aprovadas**, mais saída por mouse e 14 verificações nativas dos controles de volume.
+Use o caminho completo do Godot se ele não estiver no PATH. Os testes do pinball usam arquivos temporários para recorde e áudio. Os testes antigos de Arkanoid permanecem como referência da versão anterior e não representam as novas regras da mesa.
 
-Use o caminho do executável instalado se `godot` não estiver no PATH. O teste usa um arquivo temporário de recorde e não substitui o recorde do jogador.
+Validação no Godot 4.7.2: **48 verificações do pinball aprovadas**, saída por mouse validada e telas inspecionadas em execução nativa OpenGL.
+
+![Mesa em jogo](Docs/preview_pinball.png)

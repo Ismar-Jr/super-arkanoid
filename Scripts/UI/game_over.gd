@@ -1,4 +1,5 @@
 
+## Resultado final após as três bolas, com reinício ou retorno ao menu.
 extends Control
 
 # Componentes visuais reutilizáveis.
@@ -26,7 +27,7 @@ func _ready() -> void:
 	# Configura o fundo e o título.
 	UI.panel(_content, Rect2(0, 0, 520, 380), Color("111b35"), Color("7c5973"))
 	UI.line(_content, Rect2(0, 0, 520, 4), Color("d978a0"))
-	UI.label(_content, "CONEXÃO ENCERRADA", Rect2(24, 24, 472, 22), 12, UI.MUTED, HORIZONTAL_ALIGNMENT_CENTER)
+	UI.label(_content, "BOLAS ESGOTADAS", Rect2(24, 24, 472, 22), 12, UI.MUTED, HORIZONTAL_ALIGNMENT_CENTER)
 	UI.label(_content, "GAME OVER", Rect2(24, 54, 472, 64), 40, UI.AMBER, HORIZONTAL_ALIGNMENT_CENTER)
 	UI.line(_content, Rect2(40, 132, 440, 1), Color("435473"))
 

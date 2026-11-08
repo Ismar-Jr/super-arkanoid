@@ -14,6 +14,9 @@ signal power_up_changed(remaining_shots: int)
 signal blocks_changed(value: int)
 signal sector_cleared
 signal on_powerup
+signal multiplier_changed(value: int)
+signal reactor_changed(hits: int, goal: int)
+signal launch_charge_changed(value: float)
 
 # Configurações iniciais da partida.
 const INITIAL_LIVES := 3
@@ -28,7 +31,13 @@ var power_up_shots: int = 0
 var ready_locked: bool = false
 
 # Arquivo de persistência do recorde.
-var records_path: String = "user://records.cfg"
+var records_path: String = "user://pinball_records.cfg"
+
+# Dados exclusivos da mesa; o recorde do Arkanoid permanece separado.
+var multiplier: int = 1
+var reactor_hits: int = 0
+var reactor_goal: int = 5
+var launch_charge: float = 0.0
 
 # Compatibilidade com os scripts que utilizam started.
 var started: bool:
@@ -46,6 +55,9 @@ func new_game() -> void:
 	score = 0
 	lives = INITIAL_LIVES
 	level = 1
+	multiplier = 1
+	reactor_hits = 0
+	launch_charge = 0.0
 	blocks_remaining = 0
 	ready_locked = false
 	set_power_up(0)
@@ -53,9 +65,12 @@ func new_game() -> void:
 	score_changed.emit(score)
 	lives_changed.emit(lives)
 	level_changed.emit(level)
+	multiplier_changed.emit(multiplier)
+	reactor_changed.emit(reactor_hits, reactor_goal)
+	launch_charge_changed.emit(launch_charge)
 
 	_set_state(State.READY)
-	get_tree().change_scene_to_file("res://Scenes/main.tscn")
+	get_tree().change_scene_to_file("res://Scenes/Pinball/pinball.tscn")
 
 
 func enter_menu() -> void:
@@ -172,3 +187,38 @@ func _set_state(value: State) -> void:
 
 	state = value
 	state_changed.emit(state)
+
+
+## Bumpers, alvos e bônus usam a mesma pontuação, com multiplicador máximo de 5x.
+func add_score(points: int) -> void:
+	if state != State.PLAYING:
+		return
+	score += maxi(0, points) * multiplier
+	score_changed.emit(score)
+	if score > best_score:
+		best_score = score
+		best_score_changed.emit(best_score)
+		save_record()
+
+
+func hit_reactor() -> void:
+	if state != State.PLAYING:
+		return
+	reactor_hits += 1
+	if reactor_hits >= reactor_goal:
+		add_score(500)
+		reactor_hits = 0
+		multiplier = mini(5, multiplier + 1)
+		level += 1
+		multiplier_changed.emit(multiplier)
+		level_changed.emit(level)
+		sector_cleared.emit()
+	reactor_changed.emit(reactor_hits, reactor_goal)
+
+
+func set_launch_charge(value: float) -> void:
+	var next_value := clampf(value, 0.0, 1.0)
+	if is_equal_approx(next_value, launch_charge):
+		return
+	launch_charge = next_value
+	launch_charge_changed.emit(launch_charge)

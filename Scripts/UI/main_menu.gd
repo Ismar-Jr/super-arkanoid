@@ -1,4 +1,5 @@
 
+## Menu do pinball: identidade do reator, instruções e preferências de áudio.
 extends Control
 
 # Biblioteca de componentes visuais do arcade.
@@ -51,9 +52,9 @@ func _build_menu() -> void:
 	UI.texture(self, "res://Assets/16bit/menu_background.png", Rect2(0, 0, 960, 576))
 	UI.line(self, Rect2(48, 40, 128, 2), UI.CYAN.darkened(0.4))
 	UI.line(self, Rect2(784, 40, 128, 2), UI.CYAN.darkened(0.4))
-	UI.label(self, "SA-16  /  ORBITAL DEFENSE SYSTEM", Rect2(180, 27, 600, 28), 12, UI.MUTED, HORIZONTAL_ALIGNMENT_CENTER)
-	UI.texture(self, "res://Assets/16bit/logo.png", Rect2(200, 106, 560, 140))
-	UI.label(self, "DEFENDA O NÚCLEO. QUEBRE A ÓRBITA.", Rect2(100, 257, 760, 24), 14, UI.AMBER, HORIZONTAL_ALIGNMENT_CENTER)
+	UI.label(self, "SP-16  /  ORBITAL REACTOR", Rect2(180, 27, 600, 28), 12, UI.MUTED, HORIZONTAL_ALIGNMENT_CENTER)
+	UI.texture(self, "res://Assets/Pinball/logo.png", Rect2(200, 106, 560, 140))
+	UI.label(self, "CARREGUE O REATOR. DOMINE A ÓRBITA.", Rect2(100, 257, 760, 24), 14, UI.AMBER, HORIZONTAL_ALIGNMENT_CENTER)
 
 	# Cria os botões principais.
 	_start_button = UI.button(self, "INICIAR JOGO", Rect2(320, 310, 320, 44))
@@ -76,7 +77,7 @@ func _build_menu() -> void:
 
 	# Exibe o recorde e os indicadores inferiores.
 	_record = UI.label(self, "", Rect2(240, 495, 480, 28), 16, UI.AMBER, HORIZONTAL_ALIGNMENT_CENTER)
-	_status = UI.label(self, "SISTEMA ONLINE", Rect2(48, 525, 240, 22), 12, UI.CYAN)
+	_status = UI.label(self, "REATOR ONLINE", Rect2(48, 525, 240, 22), 12, UI.CYAN)
 	UI.label(self, "TECLADO + MOUSE", Rect2(704, 525, 208, 22), 12, UI.MUTED, HORIZONTAL_ALIGNMENT_RIGHT)
 	UI.line(self, Rect2(48, 552, 864, 1), Color("334361"))
 
@@ -184,21 +185,22 @@ func _build_help() -> void:
 	UI.line(_help, Rect2(0, 0, 960, 576), Color(0.025, 0.035, 0.08, 0.94))
 	UI.panel(_help, Rect2(148, 84, 664, 414), UI.PANEL, UI.CYAN.darkened(0.3))
 	UI.line(_help, Rect2(174, 110, 32, 4), UI.AMBER)
-	UI.label(_help, "MANUAL DE VOO", Rect2(222, 100, 530, 30), 24, UI.AMBER)
+	UI.label(_help, "MANUAL DO REATOR", Rect2(222, 100, 530, 30), 24, UI.AMBER)
 
 	# Apresenta os objetivos do jogo.
-	UI.label(_help, "DESTRUA TODOS OS BLOCOS E PROTEJA A BOLA.", Rect2(176, 150, 612, 26), 14)
-	UI.label(_help, "VOCÊ TEM 3 VIDAS PARA DEFENDER A ESTAÇÃO.", Rect2(176, 174, 612, 26), 14, UI.MUTED)
+	UI.label(_help, "ACERTE BUMPERS E ALVOS PARA PONTUAR.", Rect2(176, 150, 612, 26), 14)
+	UI.label(_help, "USE OS FLIPPERS PARA MANTER A BOLA EM JOGO.", Rect2(176, 174, 612, 26), 14, UI.MUTED)
 	UI.line(_help, Rect2(176, 215, 608, 1), Color("334361"))
 
 	# Lista os comandos disponíveis.
-	_control_row(238, "A / D   OU   SETAS", "MOVER PLATAFORMA")
-	_control_row(278, "ESPAÇO", "LANÇAR A BOLA")
-	_control_row(318, "ESC", "VOLTAR AO MENU")
+	_control_row(230, "A / ESQUERDA", "FLIPPER ESQUERDO")
+	_control_row(268, "D / DIREITA", "FLIPPER DIREITO")
+	_control_row(306, "SEGURE ESPAÇO", "CARREGAR LANÇADOR")
+	_control_row(344, "SOLTE ESPAÇO", "LANÇAR A BOLA")
 
-	# Exibe as regras dos power-ups.
-	UI.label(_help, "POWER-UP: 16 DISPAROS AUTOMÁTICOS", Rect2(176, 366, 608, 22), 14, UI.CYAN, HORIZONTAL_ALIGNMENT_CENTER)
-	UI.label(_help, "ITENS: CHANCE DE 20% • INTERVALO DE 15 SEGUNDOS", Rect2(176, 394, 608, 22), 12, UI.MUTED, HORIZONTAL_ALIGNMENT_CENTER)
+	# Completar o reator aumenta o multiplicador da pontuação.
+	UI.label(_help, "5 ACERTOS EM BUMPERS = BÔNUS E MULTIPLICADOR", Rect2(176, 384, 608, 22), 12, UI.CYAN, HORIZONTAL_ALIGNMENT_CENTER)
+	UI.label(_help, "ESC: MENU • 3 BOLAS POR PARTIDA", Rect2(176, 408, 608, 20), 12, UI.MUTED, HORIZONTAL_ALIGNMENT_CENTER)
 
 	# Cria o botão de retorno ao menu.
 	_back_button = UI.button(_help, "VOLTAR", Rect2(336, 438, 288, 40))
