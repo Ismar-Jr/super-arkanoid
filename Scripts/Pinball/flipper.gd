@@ -48,5 +48,5 @@ func on_ball_contact(ball: Node2D) -> void:
 		return
 	_stroke_hits.append(ball.get_instance_id())
 	var leverage := clampf(point.x * direction / 80.0, 0.15, 1.0)
-	var desired := Vector2(direction * (100 + 160 * leverage), -(510 + 220 * leverage))
+	var desired := Vector2(direction * (120 + 200 * leverage), -(850 + 300 * leverage))
 	ball.apply_central_impulse(desired - ball.linear_velocity)

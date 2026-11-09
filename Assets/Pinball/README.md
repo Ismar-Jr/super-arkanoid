@@ -1,39 +1,33 @@
-# Super Pinball — Orbital Reactor
+# Orbital Reactor — arte vetorial
 
-Sete PNGs originais em pixel art, gerados apenas com Python 3. O script reutiliza as primitivas de rasterização do gerador do Arkanoid e grava exclusivamente em `Assets/Pinball/`:
+O conjunto atual usa oito SVGs originais, com curvas suaves, gradientes, cromados e impressão espacial inspirada na composição das mesas clássicas. O gerador usa apenas Python 3:
 
 ```sh
 python3 Tools/generate_pinball_art.py
 ```
 
-O playfield combina trilhos cromados, circuito impresso azul, cápsulas ciano, alvos magenta e palhetas âmbar. A impressão central e as órbitas têm contraste reduzido para preservar a leitura da esfera.
+A arte combina plásticos marfim, borrachas vermelhas, insertos âmbar e turquesa, Saturno e um foguete desenhados no próprio código. Todas as letras presentes nos SVGs usam um alfabeto vetorial próprio, sem dependências de fontes instaladas. Os PNGs anteriores permanecem como recursos históricos e não são a textura da mesa vertical.
 
-| Arquivo | Dimensão | Coordenadas/uso |
+| Arquivo | Dimensão | Uso |
 | --- | --- | --- |
-| `playfield.png` | 640 × 480 | Mesa local, posicionada em (24, 64) na composição 960 × 576 |
-| `logo.png` | 560 × 140 | Novo logotipo SUPER PINBALL |
-| `ball.png` | 20 × 20 | Esfera cromada centralizada |
-| `bumper.png` | 64 × 64 | Peça circular com raio visível de aproximadamente 26 px |
-| `flipper.png` | 100 × 24 | Arte da palheta esquerda, pivô aproximado (10, 12); espelhar para a direita |
-| `target.png` | 28 × 18 | Alvo frontal iluminado magenta |
-| `life.png` | 20 × 20 | Ícone de esfera para bolas restantes |
+| `playfield.svg` | 640 × 900 | Mesa vertical; origem (40, 160) na composição 720 × 1120 |
+| `menu_background.svg` | 720 × 1120 | Fundo de backglass para o menu |
+| `logo.svg` | 560 × 140 | Identidade SUPER PINBALL / ORBITAL REACTOR |
+| `ball.svg` | 20 × 20 | Esfera cromada |
+| `life.svg` | 20 × 20 | Ícone de bolas restantes |
+| `bumper.svg` | 64 × 64 | Pop bumper cromado com cúpula iluminada |
+| `flipper.svg` | 100 × 24 | Palheta marfim com borracha vermelha; espelhada à direita |
+| `target.svg` | 28 × 18 | Alvo iluminado da bancada lateral |
 
-## Mapeamento da mesa
+As coordenadas dos trilhos, divisórias dos rollovers e slingshots correspondem às colisões em `Scripts/Pinball/table_layout.gd`. A ilustração de Saturno, as faixas, setas e a escala de bônus são impressão plana do playfield. A bola mantém destaque sobre a pintura central.
 
-Todas as coordenadas abaixo são locais ao playfield e seguem a geometria da implementação física:
+- Bumpers: (240, 245), (380, 245), (310, 345).
+- Bancada de alvos: (124, 390), (124, 438), (124, 486), girados 90°.
+- Rollovers: (230, 105), (310, 105), (390, 105). A divisória em x=430 começa em y=95 para liberar a trajetória natural do lançador; as demais começam em y=65.
+- Pivôs: (208, 825) e (412, 825).
+- Slingshots: esquerdo (110, 678), (196, 750), (132, 750); direito espelhado em x=310.
+- Canal do lançador: divisória em x=558, base em y=874, bola inicial em (590, 846).
 
-- Bumpers: (235, 146), (385, 146), (310, 227).
-- Alvos superiores: (235, 70), (310, 70), (385, 70).
-- Pivôs das palhetas: esquerda (208, 405), direita (412, 405); eixo físico de 80 px e raio de 9 px. A abertura central em repouso permite a drenagem de uma esfera de 20 px.
-- Slingshot esquerdo: triângulo (94, 298), (180, 370), (116, 370).
-- Slingshot direito: triângulo (526, 298), (440, 370), (504, 370).
-- Guia inferior esquerda: (58, 320), (78, 354), (150, 380), (196, 398).
-- Guia inferior direita: (550, 320), (530, 354), (458, 380), (424, 398).
-- Canal de lançamento: x568–610, com mola inferior em y420–458.
-- Divisória do canal: x558 de y118 a y460.
-- Trilho externo: (58, 466), (34, 430), (30, 345), (30, 100), (42, 56), (68, 28), (104, 14), (538, 14), (574, 24), (598, 46), (612, 74), (616, 120), (616, 454).
-- Saída superior do canal: o arco externo curva a trajetória para a esquerda, sem mecanismo de teleporte.
-- Base do lançador: (568, 454) até (616, 454).
-- Região inferior de drenagem: centro entre as duas palhetas; as setas das saídas laterais são apenas marcações visuais.
+As passagens entre os slingshots e as guias inferiores têm no mínimo 32,8 px livres para a bola de 20 px. A arte acompanha essa folga e mantém o canal aberto.
 
-Não há fontes, sprites ou texturas de terceiros. A fonte bitmap compartilhada, o gabinete e o fundo de menu continuam nos recursos existentes de `Assets/16bit/`.
+Referências de composição: a bancada lateral e as lâmpadas de bônus de *Eight Ball Deluxe* (Bally), a composição espacial e as borrachas vermelhas de *Firepower* (Williams), e a leitura vertical de mesas digitais como *Space Cadet*. Nenhuma imagem, marca ou sprite desses jogos foi copiada.

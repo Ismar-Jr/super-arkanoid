@@ -1,6 +1,6 @@
 [gd_scene format=3]
 [ext_resource type="Script" path="res://Scripts/Pinball/flipper.gd" id="1"]
-[ext_resource type="Texture2D" path="res://Assets/Pinball/flipper.png" id="2"]
+[ext_resource type="Texture2D" path="res://Assets/Pinball/flipper.svg" id="2"]
 [sub_resource type="CapsuleShape2D" id="Blade"]
 radius = 9.0
 height = 98.0

@@ -29,8 +29,8 @@ func launch(launch_velocity: Vector2) -> void:
 
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	# Mantém impactos rápidos controláveis sem substituir a gravidade do motor.
-	if state.linear_velocity.length() > 1100.0:
-		state.linear_velocity = state.linear_velocity.normalized() * 1100.0
+	if state.linear_velocity.length() > 1600.0:
+		state.linear_velocity = state.linear_velocity.normalized() * 1600.0
 
 
 func _physics_process(delta: float) -> void:

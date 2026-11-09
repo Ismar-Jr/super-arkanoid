@@ -16,17 +16,17 @@ var _entry: Tween
 func _ready() -> void:
 	# Bloqueia a interação com a interface atrás da tela.
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	UI.line(self, Rect2(0, 0, 960, 576), Color(0.02, 0.03, 0.07, 0.91))
+	UI.line(self, Rect2(0, 0, 720, 1120), Color(0.02, 0.03, 0.07, 0.91))
 
 	# Cria o painel central.
 	_content = Control.new()
 	_content.name = "SummaryPanel"
-	_content.position = Vector2(220, 104)
+	_content.position = Vector2(100, 350)
 	add_child(_content)
 
 	# Configura o fundo e o título.
-	UI.panel(_content, Rect2(0, 0, 520, 380), Color("111b35"), Color("7c5973"))
-	UI.line(_content, Rect2(0, 0, 520, 4), Color("d978a0"))
+	UI.panel(_content, Rect2(0, 0, 520, 380), Color("111b25"), Color("d7ae69"))
+	UI.line(_content, Rect2(0, 0, 520, 4), Color("d7ae69"))
 	UI.label(_content, "BOLAS ESGOTADAS", Rect2(24, 24, 472, 22), 12, UI.MUTED, HORIZONTAL_ALIGNMENT_CENTER)
 	UI.label(_content, "GAME OVER", Rect2(24, 54, 472, 64), 40, UI.AMBER, HORIZONTAL_ALIGNMENT_CENTER)
 	UI.line(_content, Rect2(40, 132, 440, 1), Color("435473"))
@@ -65,7 +65,7 @@ func present() -> void:
 
 	show()
 	modulate.a = 0.0
-	_content.position.y = 126
+	_content.position.y = 372
 
 	# Interrompe animações anteriores, se necessário.
 	if _entry and _entry.is_valid():
@@ -74,7 +74,7 @@ func present() -> void:
 	# Anima a transparência e a posição do painel.
 	_entry = create_tween().set_parallel()
 	_entry.tween_property(self, "modulate:a", 1.0, 0.3)
-	_entry.tween_property(_content, "position:y", 104.0, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_entry.tween_property(_content, "position:y", 350.0, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 	# Seleciona o botão de reinício para navegação por teclado.
 	_retry.grab_focus()

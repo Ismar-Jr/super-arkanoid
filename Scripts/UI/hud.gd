@@ -1,9 +1,11 @@
-## Painel do pinball: pontos, bolas, multiplicador, reator e força do lançador.
+## Backbox compacto: o placar fica acima da mesa e os controles no avental.
 extends CanvasLayer
 
 const UI = preload("res://Scripts/UI/arcade_ui.gd")
 const GAME_OVER = preload("res://Scenes/UI/game_over.tscn")
-
+const GOLD := Color("d7ae69")
+const CREAM := Color("f4e3be")
+const RED := Color("b44745")
 var _score: Label
 var _best_score: Label
 var _ball_count: Label
@@ -15,14 +17,12 @@ var _charge_value: Label
 var _charge_segments: Array[ColorRect] = []
 var _launch_charge: float = 0.0
 var _ready_prompt: Control
-var _ready_title: Label
-var _ready_hint: Label
 var _game_over
+var _status_clock: float = 0.0
 
 
 func _ready() -> void:
 	_build_interface()
-	# Cada sinal atualiza somente o indicador alterado pela partida.
 	GameManager.score_changed.connect(_update_score)
 	GameManager.best_score_changed.connect(_update_best_score)
 	GameManager.lives_changed.connect(_update_balls)
@@ -30,7 +30,6 @@ func _ready() -> void:
 	GameManager.reactor_changed.connect(_update_reactor)
 	GameManager.launch_charge_changed.connect(_update_charge)
 	GameManager.state_changed.connect(_update_state)
-	# Mostra também os dados definidos antes de este HUD entrar na árvore.
 	_update_score(GameManager.score)
 	_update_best_score(GameManager.best_score)
 	_update_balls(GameManager.lives)
@@ -40,71 +39,74 @@ func _ready() -> void:
 	_update_state(GameManager.state)
 
 
+func _process(delta: float) -> void:
+	# O canal pode receber a bola durante PLAYING, sem trocar o estado da partida.
+	_status_clock += delta
+	if _status_clock >= 0.12:
+		_status_clock = 0.0
+		_update_launcher_status()
+		_ready_prompt.visible = GameManager.state == GameManager.State.READY or _launcher_available()
+
+
 func _build_interface() -> void:
-	# A coluna direita fica fora da mesa física de 640 × 480.
-	var frame = Control.new()
+	var frame := Control.new()
 	frame.name = "Console"
 	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(frame)
-	UI.texture(frame, "res://Assets/16bit/cabinet.png", Rect2(0, 0, 960, 576))
-	UI.label(frame, "SUPER PINBALL", Rect2(58, 14, 430, 30), 24, UI.WHITE)
-	UI.label(frame, "ORBITAL REACTOR", Rect2(698, 17, 144, 24), 12, UI.CYAN, HORIZONTAL_ALIGNMENT_RIGHT)
-	UI.label(frame, "REACTOR CONSOLE", Rect2(712, 73, 208, 22), 12, UI.MUTED)
-	UI.label(frame, "SCORE", Rect2(712, 106, 208, 22), 14, UI.CYAN)
-	_score = UI.label(frame, "", Rect2(712, 130, 208, 34), 28, UI.WHITE)
+	UI.line(frame, Rect2(0, 0, 720, 156), Color("0b111c"))
+	for x in [16, 696]:
+		UI.line(frame, Rect2(x, 12, 8, 1092), Color("36424c"))
+		UI.line(frame, Rect2(x + 2, 12, 2, 1092), GOLD)
+	UI.line(frame, Rect2(40, 10, 640, 2), GOLD)
+	UI.line(frame, Rect2(40, 43, 640, 2), RED)
+	UI.label(frame, "ORBITAL REACTOR", Rect2(52, 12, 440, 30), 24, CREAM)
+	UI.label(frame, "SUPER PINBALL", Rect2(494, 16, 172, 22), 12, GOLD, HORIZONTAL_ALIGNMENT_RIGHT)
+	UI.panel(frame, Rect2(48, 52, 326, 65), Color("160e13"), Color("644343"))
+	UI.panel(frame, Rect2(388, 52, 284, 65), Color("160e13"), Color("644343"))
+	UI.label(frame, "PLAYER 1", Rect2(60, 55, 286, 16), 10, Color("ab7862"))
+	_score = UI.label(frame, "", Rect2(60, 72, 296, 38), 30, Color("ffc776"))
 	_score.name = "Score"
-	UI.line(frame, Rect2(712, 177, 208, 1), Color("354462"))
-	UI.label(frame, "HI-SCORE", Rect2(712, 190, 208, 22), 12, UI.MUTED)
-	_best_score = UI.label(frame, "", Rect2(712, 211, 208, 30), 22, UI.AMBER)
+	UI.label(frame, "GRAND CHAMPION", Rect2(400, 55, 252, 16), 10, Color("ab7862"))
+	_best_score = UI.label(frame, "", Rect2(400, 78, 252, 30), 24, GOLD)
 	_best_score.name = "BestScore"
-	UI.label(frame, "BOLAS", Rect2(712, 258, 132, 22), 12, UI.MUTED)
-	_ball_count = UI.label(frame, "", Rect2(872, 256, 48, 24), 16, UI.WHITE, HORIZONTAL_ALIGNMENT_RIGHT)
+	UI.label(frame, "BOLAS", Rect2(52, 123, 68, 22), 12, CREAM)
+	_ball_count = UI.label(frame, "", Rect2(117, 123, 36, 22), 14, GOLD)
 	_ball_count.name = "BallCount"
 	for index in 3:
-		var icon = UI.texture(frame, "res://Assets/Pinball/life.png", Rect2(716 + index * 40, 282, 22, 22))
+		var icon := UI.texture(frame, "res://Assets/Pinball/life.svg", Rect2(157 + index * 25, 124, 18, 18))
 		icon.name = "BallIcon%d" % (index + 1)
 		_ball_icons.append(icon)
-	UI.line(frame, Rect2(712, 318, 208, 1), Color("354462"))
-	UI.label(frame, "MULTIPLICADOR", Rect2(712, 330, 136, 24), 12, UI.MUTED)
-	_multiplier = UI.label(frame, "", Rect2(840, 327, 80, 28), 22, UI.CYAN, HORIZONTAL_ALIGNMENT_RIGHT)
+	UI.label(frame, "BONUS", Rect2(263, 123, 68, 22), 12, CREAM)
+	_multiplier = UI.label(frame, "", Rect2(329, 120, 62, 28), 20, UI.CYAN)
 	_multiplier.name = "Multiplier"
-	_reactor = UI.label(frame, "", Rect2(712, 358, 208, 20), 12, UI.MUTED)
+	_reactor = UI.label(frame, "", Rect2(418, 123, 248, 22), 12, GOLD, HORIZONTAL_ALIGNMENT_RIGHT)
 	_reactor.name = "Reactor"
-	UI.line(frame, Rect2(712, 390, 208, 1), Color("354462"))
-	UI.label(frame, "LANÇADOR", Rect2(712, 402, 208, 22), 12, UI.MUTED)
-	_launch_power = UI.label(frame, "", Rect2(712, 428, 208, 24), 16, UI.CYAN)
+	UI.line(frame, Rect2(40, 152, 640, 3), GOLD)
+	UI.line(frame, Rect2(40, 1062, 640, 58), Color("101722"))
+	UI.line(frame, Rect2(40, 1062, 640, 2), GOLD)
+	_launch_power = UI.label(frame, "", Rect2(52, 1068, 258, 22), 14, CREAM)
 	_launch_power.name = "LaunchPower"
-	_charge_value = UI.label(frame, "", Rect2(712, 452, 208, 20), 12, UI.MUTED)
+	_charge_value = UI.label(frame, "", Rect2(52, 1088, 284, 18), 10, GOLD)
 	_charge_value.name = "ChargeValue"
-	var segments = Control.new()
+	var segments := Control.new()
 	segments.name = "ChargeSegments"
 	segments.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	frame.add_child(segments)
 	for index in 16:
-		var segment = UI.line(segments, Rect2(712 + index * 13, 476, 10, 6), Color("26344d"))
+		var segment := UI.line(segments, Rect2(52 + index * 16, 1110, 13, 3), Color("31302f"))
 		segment.name = "Segment%02d" % (index + 1)
 		_charge_segments.append(segment)
-	UI.label(frame, "A / D  FLIPPERS", Rect2(712, 492, 208, 20), 12, UI.MUTED)
-	UI.label(frame, "ESPAÇO  LANÇAR", Rect2(712, 512, 208, 20), 12, UI.MUTED)
-	UI.label(frame, "ESC  MENU", Rect2(712, 532, 208, 20), 12, UI.MUTED)
+	UI.label(frame, "A / D OU SETAS  •  FLIPPERS", Rect2(342, 1068, 326, 22), 12, CREAM, HORIZONTAL_ALIGNMENT_RIGHT)
+	UI.label(frame, "ESPAÇO  •  MOLA     ESC  •  MENU", Rect2(342, 1090, 326, 22), 10, GOLD, HORIZONTAL_ALIGNMENT_RIGHT)
 	_build_ready(frame)
 	_game_over = GAME_OVER.instantiate()
 	add_child(_game_over)
 
 
 func _build_ready(parent: Control) -> void:
-	# O aviso só aparece enquanto a bola aguarda no lançador ou está sendo reposta.
-	_ready_prompt = Control.new()
+	# A luz fica no avental e indica quando a mola está pronta.
+	_ready_prompt = UI.panel(parent, Rect2(321, 1074, 9, 9), UI.CYAN, UI.CYAN)
 	_ready_prompt.name = "ReadyPrompt"
-	_ready_prompt.position = Vector2(184, 334)
-	_ready_prompt.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	parent.add_child(_ready_prompt)
-	UI.panel(_ready_prompt, Rect2(0, 0, 320, 76), Color(0.035, 0.065, 0.13, 0.94), UI.CYAN.darkened(0.4))
-	_ready_title = UI.label(_ready_prompt, "BOLA PRONTA", Rect2(12, 8, 296, 28), 20, UI.AMBER, HORIZONTAL_ALIGNMENT_CENTER)
-	_ready_hint = UI.label(_ready_prompt, "SEGURE ESPAÇO E SOLTE", Rect2(12, 40, 296, 24), 14, UI.WHITE, HORIZONTAL_ALIGNMENT_CENTER)
-	var blink = create_tween().set_loops()
-	blink.tween_property(_ready_hint, "modulate:a", 0.3, 0.7)
-	blink.tween_property(_ready_hint, "modulate:a", 1.0, 0.7)
 
 
 func _update_score(value: int) -> void:
@@ -118,7 +120,7 @@ func _update_best_score(value: int) -> void:
 func _update_balls(value: int) -> void:
 	_ball_count.text = "%02d" % value
 	for index in _ball_icons.size():
-		_ball_icons[index].modulate = UI.WHITE if index < value else Color("2b354d")
+		_ball_icons[index].modulate = Color.WHITE if index < value else Color("393631")
 
 
 func _update_multiplier(value: int) -> void:
@@ -131,45 +133,41 @@ func _update_reactor(hits: int, goal: int) -> void:
 
 func _update_charge(value: float) -> void:
 	_launch_charge = clampf(value, 0.0, 1.0)
-	var lit_segments = ceili(_launch_charge * _charge_segments.size())
-	var color = UI.AMBER if _launch_charge >= 0.8 else UI.CYAN
+	var lit_segments := ceili(_launch_charge * _charge_segments.size())
 	for index in _charge_segments.size():
-		_charge_segments[index].color = color if index < lit_segments else Color("26344d")
+		_charge_segments[index].color = GOLD if index < lit_segments else Color("31302f")
 	_update_launcher_status()
-	_update_ready_prompt()
+
+
+func _launcher_available() -> bool:
+	var scene := get_tree().current_scene
+	if scene == null:
+		return false
+	var table := scene.get_node_or_null("Table")
+	return table != null and table.has_method("can_launch") and table.can_launch()
 
 
 func _update_launcher_status() -> void:
-	if GameManager.state == GameManager.State.PLAYING:
-		_launch_power.text = "EM JOGO"
-		_charge_value.text = "USE OS FLIPPERS"
+	if GameManager.state == GameManager.State.GAME_OVER:
+		_launch_power.text = "PARTIDA ENCERRADA"
+		_charge_value.text = "JOGUE NOVAMENTE OU VOLTE AO MENU"
 	elif GameManager.ready_locked:
-		_launch_power.text = "REPOSICIONANDO"
-		_charge_value.text = "PREPARANDO NOVA BOLA"
+		_launch_power.text = "PREPARANDO NOVA BOLA"
+		_charge_value.text = "AGUARDE..."
 	elif _launch_charge > 0.0:
-		_launch_power.text = "CARREGANDO"
-		_charge_value.text = "FORÇA  %03d%%" % roundi(_launch_charge * 100)
+		_launch_power.text = "MOLA CARREGADA  %03d%%" % roundi(_launch_charge * 100)
+		_charge_value.text = "SOLTE ESPAÇO PARA LANÇAR"
+	elif GameManager.state == GameManager.State.READY or _launcher_available():
+		_launch_power.text = "BOLA NO LANÇADOR"
+		_charge_value.text = "SEGURE ESPAÇO E SOLTE"
 	else:
-		_launch_power.text = "PRONTO"
-		_charge_value.text = "SEGURE E SOLTE ESPAÇO"
-
-
-func _update_ready_prompt() -> void:
-	if GameManager.ready_locked:
-		_ready_title.text = "REPOSICIONANDO"
-		_ready_hint.text = "PREPARANDO NOVA BOLA"
-	elif _launch_charge > 0.0:
-		_ready_title.text = "CARREGANDO..."
-		_ready_hint.text = "SOLTE PARA LANÇAR"
-	else:
-		_ready_title.text = "BOLA PRONTA"
-		_ready_hint.text = "SEGURE ESPAÇO E SOLTE"
+		_launch_power.text = "MOLA SEMPRE DISPONÍVEL"
+		_charge_value.text = "BOLA VOLTOU AO CANAL? USE ESPAÇO"
 
 
 func _update_state(value: int) -> void:
 	_ready_prompt.visible = value == GameManager.State.READY
 	_update_launcher_status()
-	_update_ready_prompt()
 	if value == GameManager.State.GAME_OVER:
 		_game_over.present()
 	else:

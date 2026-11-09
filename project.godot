@@ -26,8 +26,10 @@ AudioManager="*res://Scenes/audio_manager.tscn"
 
 [display]
 
-window/size/viewport_width=960
-window/size/viewport_height=576
+window/size/viewport_width=720
+window/size/viewport_height=1120
+window/size/window_width_override=540
+window/size/window_height_override=840
 window/stretch/mode="viewport"
 
 [dotnet]
@@ -71,12 +73,10 @@ Start={
 [physics]
 
 common/physics_ticks_per_second=120
-
 3d/physics_engine="Jolt Physics"
 
 [rendering]
 
-textures/canvas_textures/default_texture_filter=0
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"

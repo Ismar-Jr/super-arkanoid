@@ -27,6 +27,11 @@ func frames(count: int = 4) -> void:
 		await process_frame
 
 
+func physics_frames(count: int) -> void:
+	for index in count:
+		await physics_frame
+
+
 func key(code: Key, pressed: bool) -> void:
 	var event := InputEventKey.new()
 	event.keycode = code
@@ -46,8 +51,16 @@ func click(button: Button) -> void:
 	root.push_input(release, true)
 
 
+func place_ball(ball: RigidBody2D, point: Vector2, velocity: Vector2) -> void:
+	# Aguarda o corpo congelado sincronizar a posição antes de testar outro percurso.
+	ball.reset_to(point)
+	await physics_frame
+	await physics_frame
+	ball.launch(velocity)
+
+
 func _run() -> void:
-	root.size = Vector2i(960, 576)
+	root.size = Vector2i(720, 1120)
 	manager = root.get_node("GameManager")
 	audio = root.get_node("AudioManager")
 	check(manager.records_path == "user://pinball_records.cfg", "recorde separado do Arkanoid")
@@ -82,7 +95,7 @@ func _run() -> void:
 	var ball_id := ball.get_instance_id()
 	check(ball.freeze and manager.state == manager.State.READY and manager.lives == 3,
 		"três bolas e esfera parada aguardando o lançador")
-	check(ball.position.distance_to(Vector2(590, 426)) < 0.1 and table.position == Vector2(24, 64),
+	check(ball.position.distance_to(Vector2(590, 846)) < 0.1 and table.position == Vector2(40, 160),
 		"lançador e mesa nas posições previstas")
 	check(ball.continuous_cd == RigidBody2D.CCD_MODE_CAST_SHAPE and ball.contact_monitor,
 		"esfera usa detecção contínua e contatos físicos")
@@ -102,44 +115,83 @@ func _run() -> void:
 	check(manager.started and not ball.freeze and ball.linear_velocity.y < -600,
 		"soltar Espaço lança a esfera com impulso vertical")
 	check(is_zero_approx(manager.launch_charge), "lançamento zera a barra de força")
-	await create_timer(0.8).timeout
-	check(ball.position.x < 558, "arco superior conduz a bola do canal para a mesa")
-	ball.reset_to(table.to_global(Vector2(310, 320)))
-	ball.launch(Vector2.ZERO)
+	var entered_field := false
+	var launch_elapsed := 0.0
+	while launch_elapsed < 2.6 and manager.started:
+		await physics_frame
+		launch_elapsed += 1.0 / Engine.physics_ticks_per_second
+		if ball.position.x < 544 and ball.position.y > 170 and ball.position.y < 450:
+			entered_field = true
+			break
+	check(entered_field, "arco superior conduz a bola do canal para a mesa")
+	if not entered_field:
+		_finish()
+		return
+	await place_ball(ball, table.to_global(Vector2(310, 600)), Vector2.ZERO)
 	await create_timer(0.1).timeout
-	check(ball.linear_velocity.y > 40 and ball.position.y > 320, "gravidade acelera a bola para baixo")
+	check(ball.linear_velocity.y > 40 and ball.position.y > 600, "gravidade acelera a bola para baixo")
 	var before_score: int = manager.score
-	ball.reset_to(table.to_global(Vector2(310, 278)))
-	ball.launch(Vector2(0, -350))
+	await place_ball(ball, table.to_global(Vector2(310, 396)), Vector2(0, -350))
 	await create_timer(0.09).timeout
 	check(manager.score > before_score and ball.linear_velocity.y > 100,
 		"contato real com bumper pontua e rebate a esfera")
-	ball.reset_to(table.to_global(Vector2(48, 200)))
-	ball.launch(Vector2(-400, 0))
+	await place_ball(ball, table.to_global(Vector2(48, 300)), Vector2(-400, 0))
 	await create_timer(0.065).timeout
 	check(ball.linear_velocity.x > 0 and ball.position.x > 44, "trilho esquerdo rebate sem atravessamento")
-	ball.reset_to(table.to_global(Vector2(255, 398)))
-	ball.launch(Vector2(0, 40))
+	await place_ball(ball, table.to_global(Vector2(255, 818)), Vector2(0, 40))
 	await frames(3)
 	key(KEY_A, true)
-	await create_timer(0.075).timeout
+	await physics_frames(11)
 	check(left.rotation_degrees < -20 and right.rotation_degrees < -20,
 		"A aciona somente a palheta esquerda")
 	check(ball.linear_velocity.y < -200, "palheta esquerda devolve fisicamente a bola para cima")
 	key(KEY_A, false)
-	await create_timer(0.1).timeout
+	await physics_frames(14)
 	check(absf(left.rotation_degrees - 22) < 1, "soltar A recolhe a palheta esquerda")
-	ball.reset_to(table.to_global(Vector2(365, 398)))
-	ball.launch(Vector2(0, 40))
+	await place_ball(ball, table.to_global(Vector2(365, 818)), Vector2(0, 40))
 	await frames(3)
 	key(KEY_D, true)
-	await create_timer(0.075).timeout
+	await physics_frames(11)
 	check(right.rotation_degrees > 20, "D aciona a palheta direita")
 	check(ball.linear_velocity.y < -200, "palheta direita devolve fisicamente a bola para cima")
 	key(KEY_D, false)
-	await create_timer(0.1).timeout
+	await physics_frames(14)
 	check(absf(right.rotation_degrees + 22) < 1, "soltar D recolhe a palheta direita")
 	ball.freeze = true
+	# As três passagens superiores pontuam pelo contato real com a Area2D.
+	table.get_node("TimerLanes").stop()
+	table._lane_lights.assign([false, false, false])
+	table._lane_bank_complete = false
+	manager.reactor_hits = 0
+	check(table.get_node("Rollover0") is Area2D and table.get_node("Rollover1") is Area2D
+		and table.get_node("Rollover2") is Area2D, "três lanes superiores têm sensores físicos")
+	var before_lanes: int = manager.score
+	var lane_multiplier: int = manager.multiplier
+	await place_ball(ball, table.to_global(Vector2(230, 70)), Vector2(0, 170))
+	await create_timer(0.18).timeout
+	ball.freeze = true
+	check(table._lane_lights[0] and manager.score == before_lanes + 150 * lane_multiplier,
+		"passagem física pela lane A acende a lâmpada e concede 150 pontos")
+	await place_ball(ball, table.to_global(Vector2(230, 70)), Vector2(0, 170))
+	await create_timer(0.18).timeout
+	ball.freeze = true
+	check(manager.score == before_lanes + 150 * lane_multiplier,
+		"repetir uma lane acesa não duplica a pontuação")
+	for x in [310, 390]:
+		await place_ball(ball, table.to_global(Vector2(x, 70)), Vector2(0, 170))
+		await create_timer(0.18).timeout
+		ball.freeze = true
+	check(table._lane_bank_complete and manager.score == before_lanes + 1200 * lane_multiplier
+		and manager.reactor_hits == 1, "completar A/B/C concede bônus e uma carga do reator")
+	await create_timer(1.5).timeout
+	check(not table._lane_bank_complete and table._lane_lights.all(func(lit: bool): return not lit),
+		"lanes apagam após o bônus e aceitam outra sequência")
+	var before_repeated_lane: int = manager.score
+	await place_ball(ball, table.to_global(Vector2(230, 70)), Vector2(0, 170))
+	await create_timer(0.18).timeout
+	ball.freeze = true
+	check(manager.score == before_repeated_lane + 150 * lane_multiplier,
+		"lane reiniciada volta a pontuar por contato físico")
 	# Um alvo só pontua uma vez até a bancada completar e apagar suas luzes.
 	var targets := get_nodes_in_group("pinball_targets")
 	for target in targets:
@@ -175,8 +227,7 @@ func _run() -> void:
 	var saved_score: int = manager.score
 	var music_id: int = audio.music.get_instance_id()
 	var track: AudioStream = audio.music.stream
-	ball.reset_to(table.to_global(Vector2(310, 463)))
-	ball.launch(Vector2(0, 300))
+	await place_ball(ball, table.to_global(Vector2(310, 883)), Vector2(0, 300))
 	await create_timer(0.12).timeout
 	check(manager.lives == 2 and manager.state == manager.State.READY and manager.ready_locked,
 		"drenagem real desconta uma bola e bloqueia o lançador")
@@ -184,7 +235,7 @@ func _run() -> void:
 	check(manager.lives == 2 and not table.launch_ball(), "mesma queda não desconta duas bolas nem permite relançamento")
 	await create_timer(1.3).timeout
 	check(ball.get_instance_id() == ball_id and ball.freeze and ball.visible
-		and ball.position.distance_to(Vector2(590, 426)) < 0.1,
+		and ball.position.distance_to(Vector2(590, 846)) < 0.1,
 		"reposição reutiliza a mesma esfera no lançador")
 	check(manager.score == saved_score and manager.multiplier == 5 and not manager.ready_locked,
 		"nova bola preserva pontuação e multiplicador")
@@ -200,7 +251,8 @@ func _run() -> void:
 	await frames(5)
 	check(manager.lives == 0 and manager.state == manager.State.GAME_OVER and ball.freeze,
 		"terceira drenagem encerra a partida")
-	check(table.get_node("TimerRespawn").is_stopped() and table.get_node("TimerTargets").is_stopped(),
+	check(table.get_node("TimerRespawn").is_stopped() and table.get_node("TimerTargets").is_stopped()
+		and table.get_node("TimerLanes").is_stopped(),
 		"Game Over interrompe temporizadores da mesa")
 	check(not audio.music.playing and current_scene.get_node("HUD/GameOver").visible,
 		"Game Over mostra resultado e encerra a música")

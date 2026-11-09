@@ -48,50 +48,44 @@ func _ready() -> void:
 
 
 func _build_menu() -> void:
-	# Cria o fundo e os elementos visuais do menu.
-	UI.texture(self, "res://Assets/16bit/menu_background.png", Rect2(0, 0, 960, 576))
-	UI.line(self, Rect2(48, 40, 128, 2), UI.CYAN.darkened(0.4))
-	UI.line(self, Rect2(784, 40, 128, 2), UI.CYAN.darkened(0.4))
-	UI.label(self, "SP-16  /  ORBITAL REACTOR", Rect2(180, 27, 600, 28), 12, UI.MUTED, HORIZONTAL_ALIGNMENT_CENTER)
-	UI.texture(self, "res://Assets/Pinball/logo.png", Rect2(200, 106, 560, 140))
-	UI.label(self, "CARREGUE O REATOR. DOMINE A ÓRBITA.", Rect2(100, 257, 760, 24), 14, UI.AMBER, HORIZONTAL_ALIGNMENT_CENTER)
-
-	# Cria os botões principais.
-	_start_button = UI.button(self, "INICIAR JOGO", Rect2(320, 310, 320, 44))
-	_help_button = UI.button(self, "COMO JOGAR", Rect2(320, 365, 320, 44))
-	var quit_button = UI.button(self, "SAIR", Rect2(320, 420, 320, 44))
-
+	UI.texture(self, "res://Assets/Pinball/menu_background.svg", Rect2(0, 0, 720, 1120))
+	UI.line(self, Rect2(52, 42, 616, 2), Color("d7ae69"))
+	UI.label(self, "ORBITAL AMUSEMENTS  /  CLASSIC SERIES", Rect2(52, 52, 616, 26), 12, Color("d7ae69"), HORIZONTAL_ALIGNMENT_CENTER)
+	UI.texture(self, "res://Assets/Pinball/logo.svg", Rect2(80, 142, 560, 140))
+	UI.label(self, "ORBITAL REACTOR", Rect2(60, 303, 600, 38), 24, Color("f4e3be"), HORIZONTAL_ALIGNMENT_CENTER)
+	UI.label(self, "UMA MESA. TRÊS BOLAS. SUA MELHOR PARTIDA.", Rect2(60, 349, 600, 26), 12, Color("d7ae69"), HORIZONTAL_ALIGNMENT_CENTER)
+	UI.panel(self, Rect2(196, 410, 328, 72), Color("170f16"), Color("755b42"))
+	UI.label(self, "GRAND CHAMPION", Rect2(208, 417, 304, 18), 10, Color("b88e68"), HORIZONTAL_ALIGNMENT_CENTER)
+	_record = UI.label(self, "", Rect2(208, 438, 304, 34), 24, Color("ffc776"), HORIZONTAL_ALIGNMENT_CENTER)
+	_start_button = UI.button(self, "INICIAR JOGO", Rect2(192, 532, 336, 54))
+	_help_button = UI.button(self, "COMO JOGAR", Rect2(192, 604, 336, 54))
+	var quit_button := UI.button(self, "SAIR", Rect2(192, 676, 336, 54))
 	_start_button.name = "StartButton"
 	_help_button.name = "HelpButton"
 	quit_button.name = "QuitButton"
-
 	_main_buttons = [_start_button, _help_button, quit_button]
-
-	# Conecta as ações dos botões.
+	for option in _main_buttons:
+		option.add_theme_stylebox_override("normal", UI.box_style(Color("16202a"), Color("af8b58"), 2))
+		option.add_theme_color_override("font_color", Color("f4e3be"))
 	_start_button.pressed.connect(GameManager.new_game)
 	_help_button.pressed.connect(_show_help)
 	quit_button.pressed.connect(AudioManager.quit_game)
-
-	# Configura a navegação entre as opções.
 	UI.focus_loop(_main_buttons)
-
-	# Exibe o recorde e os indicadores inferiores.
-	_record = UI.label(self, "", Rect2(240, 495, 480, 28), 16, UI.AMBER, HORIZONTAL_ALIGNMENT_CENTER)
-	_status = UI.label(self, "REATOR ONLINE", Rect2(48, 525, 240, 22), 12, UI.CYAN)
-	UI.label(self, "TECLADO + MOUSE", Rect2(704, 525, 208, 22), 12, UI.MUTED, HORIZONTAL_ALIGNMENT_RIGHT)
-	UI.line(self, Rect2(48, 552, 864, 1), Color("334361"))
-
-	# Adiciona os controles de áudio.
+	UI.label(self, "A / D OU SETAS", Rect2(92, 788, 536, 24), 16, Color("f4e3be"), HORIZONTAL_ALIGNMENT_CENTER)
+	UI.label(self, "SEGURE ESPAÇO E SOLTE PARA LANÇAR", Rect2(92, 819, 536, 24), 12, Color("d7ae69"), HORIZONTAL_ALIGNMENT_CENTER)
+	UI.line(self, Rect2(92, 880, 536, 1), Color("755b42"))
 	_build_volume_controls()
+	_status = UI.label(self, "INSERT COIN? AQUI É SÓ DAR PLAY.", Rect2(52, 1020, 616, 24), 12, UI.CYAN, HORIZONTAL_ALIGNMENT_CENTER)
+	UI.line(self, Rect2(52, 1074, 616, 2), Color("d7ae69"))
 
 
 func _build_volume_controls() -> void:
 	# Cria os controles independentes de música e efeitos.
-	UI.label(self, "MÚSICA", Rect2(290, 523, 60, 22), 12, UI.MUTED)
-	_music_slider = _volume_slider("MusicVolume", Rect2(356, 525, 108, 18))
+	UI.label(self, "MÚSICA", Rect2(116, 916, 92, 22), 12, UI.MUTED)
+	_music_slider = _volume_slider("MusicVolume", Rect2(218, 918, 140, 18))
 
-	UI.label(self, "EFEITOS", Rect2(486, 523, 70, 22), 12, UI.MUTED)
-	_sfx_slider = _volume_slider("SFXVolume", Rect2(564, 525, 124, 18))
+	UI.label(self, "EFEITOS", Rect2(384, 916, 80, 22), 12, UI.MUTED)
+	_sfx_slider = _volume_slider("SFXVolume", Rect2(476, 918, 128, 18))
 
 	_volume_controls = [_music_slider, _sfx_slider]
 
@@ -155,7 +149,7 @@ func _volume_slider(node_name: String, rect: Rect2) -> HSlider:
 
 
 func _slider_icon(color: Color) -> Texture2D:
-	# Desenha o indicador pixelado do controle de volume.
+	# Desenha o indicador do controle de volume.
 	var image = Image.create(8, 12, false, Image.FORMAT_RGBA8)
 	image.fill(Color("0b1529"))
 	image.fill_rect(Rect2i(1, 1, 6, 10), color)
@@ -175,49 +169,34 @@ func _update_volumes(music: float, sfx: float) -> void:
 
 
 func _build_help() -> void:
-	# Cria a camada do manual de instruções.
 	_help = Control.new()
 	_help.name = "HelpOverlay"
 	_help.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(_help)
-
-	# Configura o fundo e o cabeçalho.
-	UI.line(_help, Rect2(0, 0, 960, 576), Color(0.025, 0.035, 0.08, 0.94))
-	UI.panel(_help, Rect2(148, 84, 664, 414), UI.PANEL, UI.CYAN.darkened(0.3))
-	UI.line(_help, Rect2(174, 110, 32, 4), UI.AMBER)
-	UI.label(_help, "MANUAL DO REATOR", Rect2(222, 100, 530, 30), 24, UI.AMBER)
-
-	# Apresenta os objetivos do jogo.
-	UI.label(_help, "ACERTE BUMPERS E ALVOS PARA PONTUAR.", Rect2(176, 150, 612, 26), 14)
-	UI.label(_help, "USE OS FLIPPERS PARA MANTER A BOLA EM JOGO.", Rect2(176, 174, 612, 26), 14, UI.MUTED)
-	UI.line(_help, Rect2(176, 215, 608, 1), Color("334361"))
-
-	# Lista os comandos disponíveis.
-	_control_row(230, "A / ESQUERDA", "FLIPPER ESQUERDO")
-	_control_row(268, "D / DIREITA", "FLIPPER DIREITO")
-	_control_row(306, "SEGURE ESPAÇO", "CARREGAR LANÇADOR")
-	_control_row(344, "SOLTE ESPAÇO", "LANÇAR A BOLA")
-
-	# Completar o reator aumenta o multiplicador da pontuação.
-	UI.label(_help, "5 ACERTOS EM BUMPERS = BÔNUS E MULTIPLICADOR", Rect2(176, 384, 608, 22), 12, UI.CYAN, HORIZONTAL_ALIGNMENT_CENTER)
-	UI.label(_help, "ESC: MENU • 3 BOLAS POR PARTIDA", Rect2(176, 408, 608, 20), 12, UI.MUTED, HORIZONTAL_ALIGNMENT_CENTER)
-
-	# Cria o botão de retorno ao menu.
-	_back_button = UI.button(_help, "VOLTAR", Rect2(336, 438, 288, 40))
+	UI.line(_help, Rect2(0, 0, 720, 1120), Color(0.025, 0.035, 0.06, 0.97))
+	UI.panel(_help, Rect2(52, 132, 616, 860), Color("101a27"), Color("d7ae69"))
+	UI.label(_help, "COMO JOGAR", Rect2(80, 164, 560, 42), 28, Color("f4e3be"), HORIZONTAL_ALIGNMENT_CENTER)
+	UI.label(_help, "MANTENHA A BOLA EM JOGO.", Rect2(80, 226, 560, 28), 16, Color("d7ae69"), HORIZONTAL_ALIGNMENT_CENTER)
+	UI.label(_help, "ACERTE BUMPERS, ALVOS E PISTAS.", Rect2(80, 260, 560, 26), 14, UI.MUTED, HORIZONTAL_ALIGNMENT_CENTER)
+	_control_row(326, "A / ESQUERDA", "FLIPPER ESQUERDO")
+	_control_row(416, "D / DIREITA", "FLIPPER DIREITO")
+	_control_row(506, "SEGURE ESPAÇO", "CARREGAR A MOLA")
+	_control_row(596, "SOLTE ESPAÇO", "LANÇAR OU RELANÇAR")
+	UI.label(_help, "VOLTOU AO CANAL? USE A MOLA DE NOVO.", Rect2(80, 708, 560, 24), 12, UI.CYAN, HORIZONTAL_ALIGNMENT_CENTER)
+	UI.label(_help, "COMPLETE A / B / C PARA GANHAR BÔNUS.", Rect2(80, 746, 560, 24), 12, Color("d7ae69"), HORIZONTAL_ALIGNMENT_CENTER)
+	UI.label(_help, "5 BUMPERS AUMENTAM SEU MULTIPLICADOR.", Rect2(80, 778, 560, 24), 12, Color("d7ae69"), HORIZONTAL_ALIGNMENT_CENTER)
+	UI.label(_help, "3 BOLAS POR PARTIDA  •  ESC VOLTA AO MENU", Rect2(80, 810, 560, 24), 12, UI.MUTED, HORIZONTAL_ALIGNMENT_CENTER)
+	_back_button = UI.button(_help, "VOLTAR", Rect2(204, 872, 312, 52))
 	_back_button.name = "BackButton"
 	_back_button.pressed.connect(_hide_help)
-
 	UI.focus_loop([_back_button])
-
-	# Mantém o manual oculto inicialmente.
 	_help.hide()
 
 
 func _control_row(y: float, key: String, description: String) -> void:
-	# Cria uma linha padronizada de comando e descrição.
-	UI.panel(_help, Rect2(176, y, 258, 30), Color("1c2c48"), Color("435473"))
-	UI.label(_help, key, Rect2(188, y, 234, 30), 14, UI.CYAN, HORIZONTAL_ALIGNMENT_CENTER)
-	UI.label(_help, description, Rect2(458, y, 328, 30), 14)
+	UI.panel(_help, Rect2(176, y, 368, 34), Color("202a32"), Color("8f754f"))
+	UI.label(_help, key, Rect2(188, y, 344, 34), 14, Color("f4e3be"), HORIZONTAL_ALIGNMENT_CENTER)
+	UI.label(_help, description, Rect2(108, y + 41, 504, 28), 14, Color("d7ae69"), HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _show_help() -> void:
@@ -259,4 +238,4 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 func _update_record(value: int) -> void:
 	# Atualiza o recorde exibido no menu.
-	_record.text = "HI-SCORE  %08d" % value
+	_record.text = "%08d" % value

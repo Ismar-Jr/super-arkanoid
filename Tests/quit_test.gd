@@ -11,7 +11,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	# Abre o menu principal na resolução do jogo.
-	root.size = Vector2i(960, 576)
+	root.size = Vector2i(720, 1120)
 	change_scene_to_file("res://Scenes/UI/main_menu.tscn")
 
 	# Aguarda o carregamento da interface.

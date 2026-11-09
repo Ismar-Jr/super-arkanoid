@@ -1,6 +1,6 @@
 [gd_scene format=3]
 [ext_resource type="Script" path="res://Scripts/Pinball/target.gd" id="1"]
-[ext_resource type="Texture2D" path="res://Assets/Pinball/target.png" id="2"]
+[ext_resource type="Texture2D" path="res://Assets/Pinball/target.svg" id="2"]
 [sub_resource type="RectangleShape2D" id="Body"]
 size = Vector2(28, 14)
 [sub_resource type="RectangleShape2D" id="Sensor"]

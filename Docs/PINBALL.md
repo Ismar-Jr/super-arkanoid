@@ -1,72 +1,71 @@
-# Super Pinball — Orbital Reactor
+# Orbital Reactor — mesa vertical
 
-## Implementação
+## Composição
 
-A branch `codex/pinball` parte do commit da versão 16-bit e apresenta uma mesa completa no mesmo gabinete 960 × 576, com o campo 640 × 480 em (24, 64). Menu, fonte, Game Over, sistema de áudio e controles de volume foram reaproveitados. A identidade e o manual agora descrevem pinball.
+A branch `codex/pinball` usa viewport de 720 × 1120 e janela inicial de 540 × 840. O playfield de 640 × 900 começa em (40, 160). O placar ocupa o backbox superior; o avental inferior mostra controles e carga da mola. Menu, manual e Game Over seguem a mesma orientação.
 
-A jogabilidade é própria: uma esfera `RigidBody2D`, gravidade, flippers articulados, canal com lançador variável, três bumpers, três alvos, duas borrachas triangulares, saídas laterais e drenagem inferior. Cada partida usa três bolas. Não há geração de tiros ou blocos na mesa.
+A arte vetorial original combina Saturno e um foguete, plásticos marfim, borrachas vermelhas, cromados e insertos luminosos. A fonte da interface é a fonte padrão suave do Godot. As lâmpadas A/B/C, de multiplicador e de bola em jogo acompanham os dados reais da partida.
 
-## Física e controle
+## Referências pesquisadas
 
-- A esfera circular tem raio 10, gravidade de 0,72 da gravidade 2D padrão e detecção contínua por forma.
-- A simulação usa 120 passos por segundo. `_integrate_forces` limita a velocidade a 1.100 px/s sem substituir a gravidade do motor.
-- Flippers são corpos animáveis com cápsulas de raio 9 e eixo de 80 px. Pivôs (208, 405) e (412, 405), repouso de ±22° e golpe até ∓28°.
-- A rotação física afeta a esfera. Um impulso por golpe completa a resposta apenas perto da palheta; manter a tecla não acumula impulsos contínuos.
-- Bumpers usam um corpo circular e um sensor próximo à borda visível. O intervalo de 140 ms protege o mesmo contato de pontuar duas vezes.
-- A força do lançador cresce ao segurar Espaço, limitada a 100%. Um toque breve também gera força suficiente para sair do canal.
-- O arco superior redireciona a esfera pelas próprias colisões; não há teleporte do lançador para o campo.
-- Colisões ficam em camadas próprias: esfera 128, mesa 256, flippers 512 e sensores 1.024.
+- [Firepower — folheto original da Williams, 1980](https://flyers.arcade-museum.com/pinballs/show/6886): composição espacial, borrachas e leitura de uma mesa física.
+- [Eight Ball Deluxe — instruções da Bally](https://www.pinballrebel.com/game/pins/instruction/Eight_Ball_Deluxe.pdf): pistas com letras, bancadas, bônus e três bolas.
+- [Eight Ball Deluxe — fotografia do playfield](https://www.coinopking.co.uk/pinball-machines/p/bally-eightball-deluxe): distribuição vertical, contraste dos plásticos e insertos de bônus.
 
-## Partida e pontuação
+As referências orientam o desenho; a ilustração, o nome e os recursos gráficos desta mesa são originais. O jogo não implementa rampas elevadas ou multiball.
 
-`GameManager` continua como fonte única dos estados `MAIN_MENU`, `READY`, `PLAYING` e `GAME_OVER`. O lançador só funciona em READY sem bloqueio. Drenagem muda o estado imediatamente e rejeita uma segunda perda da mesma bola. A reposição usa um Timer de 1,2 segundo e a mesma instância física.
+## Física
 
-Cada bumper vale 100, alvo 250 e borracha triangular 50 pontos base. Acender a bancada de três alvos dá 1.000 pontos de bônus, depois apaga as luzes em 1,4 segundo. Cinco ativações do reator dão 500 pontos de bônus e aumentam o multiplicador até 5x. O valor atual multiplica eventos e bônus.
+A esfera usa `RigidBody2D`, raio 10, gravidade de 0,72 da gravidade padrão, detecção contínua por forma e limite de 1.600 px/s. A simulação roda a 120 passos por segundo. Flippers em (208, 825) e (412, 825) articulam cápsulas de eixo 80 e raio 9, com repouso ±22° e golpe ∓28°. O impulso por golpe foi ajustado à altura da mesa e não se repete enquanto a tecla permanece pressionada.
 
-O recorde usa `user://pinball_records.cfg`. Pontuação, multiplicador e alvos parcialmente acesos permanecem entre bolas. Nova partida restaura todos os dados, preservando o recorde. As APIs antigas de blocos permanecem disponíveis para carregar os scripts de referência do Arkanoid; a mesa usa `add_score` e `hit_reactor`.
+`table_layout.gd` centraliza os contornos, guias, divisórias superiores, posições das pistas e slingshots. As cápsulas dos trilhos são divididas em trechos de até 120 px: cápsulas muito longas produziam contatos falsos do CCD no canal do lançador. A segmentação preserva o contorno e o raio de 4 px.
 
-A música não reinicia ao repor a esfera. Bumpers, flippers, alvos, lançamento e bônus reaproveitam efeitos do gerenciador existente, incluindo as escolhas de áudio feitas pelo usuário.
+A divisória superior direita começa em y=95, deixando o disparo sair do arco e descer pela pista C. O movimento depende da física, sem teleporte para o centro da mesa.
 
-## Novos arquivos
+A falha anterior dos canais inferiores vinha dos triângulos atravessando as guias. As borrachas ficam acima das guias e oferecem 36,9 px livres à esquerda e 32,8 px à direita para a bola de diâmetro 20 px. Os testes medem a folga e percorrem cada passagem com três entradas físicas distintas.
 
-- `Scenes/Pinball/pinball.tscn`, `ball.tscn`, `flipper.tscn`, `bumper.tscn`, `target.tscn`.
-- `Scripts/Pinball/table.gd`, `table_layout.gd`, `ball.gd`, `flipper.gd`, `bumper.gd`, `target.gd`, `slingshot.gd`, `score_popup.gd`.
-- `Assets/Pinball/`: playfield, logo, esfera, bumper, flipper, alvo e ícone de bola, com documentação e metadados de importação.
-- `Tools/generate_pinball_art.py`.
-- `Tests/pinball_test.gd`.
-- Este relatório e capturas de execução em `Docs/preview_pinball*.png`.
+## Mola e retorno ao canal
 
-## Arquivos adaptados
+`table.can_launch()` aceita o estado READY desbloqueado ou uma bola em PLAYING fisicamente na base do canal (x entre 572 e 604, y entre 800 e 865). Espaço começa a carregar inclusive se a tecla já estiver pressionada quando a bola chegar. Soltar aplica a velocidade de lançamento à mesma esfera, mantendo a partida em PLAYING.
 
-- `project.godot`: título, frequência da física e camadas da mesa.
-- `Scripts/game_manager.gd`: novo destino de partida, recorde separado, reator, multiplicador e força do lançador.
-- `Scripts/UI/main_menu.gd`, `hud.gd`, `game_over.gd`: identidade, controles e indicadores próprios de pinball.
-- `README.md`: execução, regras e estrutura desta branch.
+A carga vai até 100%; o impulso vertical varia de 1.270 a 1.540 px/s. A base usa um corpo com material absorvente próprio para a bola repousar em vez de quicar indefinidamente. Pressionar Espaço no campo não desloca a bola para o lançador. A reposição após drenagem bloqueia o lançamento por 1,2 segundo.
 
-Os arquivos de áudio e os scripts antigos de Arkanoid foram preservados.
+## Regras
 
-## Validação
+Três bolas por partida. Bumpers valem 100, pistas superiores 150, alvos 250 e slingshots 50 pontos base. Completar A/B/C dá mais 750 e uma carga do reator; completar os alvos dá mais 1.000. Cada bancada completa apaga suas luzes após 1,4 segundo. Cinco cargas do reator dão 500 pontos e elevam o multiplicador, limitado a 5x.
 
-Executado em **7 de novembro de 2026**, no Godot **4.7.2 Mono**.
+A drenagem muda o estado imediatamente e evita perdas duplicadas. A reposição reutiliza a esfera e preserva pontos e progresso. Game Over interrompe os temporizadores, apresenta o resultado e permite reiniciar ou voltar ao menu.
 
-- `Tests/pinball_test.gd`: **48 verificações, 0 falhas**, saída 0.
-- Inclui entrada real de mouse/teclado no menu, carga e liberação do lançador, saída pelo arco, gravidade, rebote no trilho, contato de bumper, dois flippers devolvendo a esfera para cima, bancada, multiplicador, recorde, drenagem física, proteção contra perda duplicada, reposição, Game Over, reinício e retorno ao menu.
-- `Tests/quit_test.gd`: clique real em SAIR encerrou o aplicativo, saída 0.
-- Logs finais com `--verbose`: sem erros de scripts, recursos ausentes, vazamentos de objetos, recursos ou RIDs.
+O recorde usa `user://pinball_records.cfg`. O gerenciador de áudio e as músicas e efeitos escolhidos pelo usuário foram preservados.
+
+## Recursos e validação
+
+Os oito SVGs são gerados por `Tools/generate_pinball_art.py`, usando apenas Python padrão. `Assets/Pinball/README.md` documenta tamanhos e posições. Os PNGs anteriores ficam como histórico e não são usados pela nova mesa.
+
+As suítes `pinball_test.gd`, `pinball_channels_test.gd` e `pinball_launcher_test.gd` cobrem controles reais, física, pontos, bancadas, drenagem, persistência, retorno ao canal e relançamentos. `quit_test.gd` verifica o clique em SAIR. Arquivos temporários isolam recordes e preferências usados nos testes.
+
+## Resultado da validação
+
+Validado em 8 de novembro de 2026 no Godot 4.7.2 Mono:
+
+- Integração principal: **54 verificações, 0 falhas**.
+- Lançador e retornos ao canal: **21 verificações, 0 falhas**.
+- Canais inferiores: **8 verificações, 0 falhas**.
+- Botão SAIR acionado por clique real: saída 0.
+- Total: **83 verificações aprovadas**, além do teste de encerramento.
 - Execução nativa OpenGL: menu, manual, mesa pronta, mesa em jogo e Game Over renderizados e inspecionados.
-- Gerador de arte executado novamente: os hashes dos sete PNGs novos permaneceram idênticos e os PNGs anteriores não foram modificados.
-- `git diff --check`: sem problemas de whitespace.
+- Oito SVGs validados e geração determinística conferida.
+- Sem erros de scripts ou recursos ausentes nas execuções do jogo. Os testes headless no ambiente restrito registram apenas a mensagem de certificados do macOS.
+- `git diff --check` sem problemas.
 
-Os recordes e preferências usados pelos testes ficaram em arquivos temporários separados. A execução headless em ambiente restrito emite uma mensagem de certificados do macOS; ela não impediu os testes. A execução gráfica nativa terminou sem mensagens de erro.
-
-A implementação e os testes ficaram exclusivamente em `codex/pinball`. `develop` e `codex/redesign-16bit` permanecem nos commits anteriores, sem merge do experimento.
-
-## Escopo desta versão
-
-Uma mesa original, três bolas, bancada de bônus, reator e multiplicador. A geometria foi feita para uma composição horizontal de gabinete; futuras mesas podem explorar outros percursos e proporções. O código contém comentários curtos em português nos pontos de física e coordenação.
+As alterações permanecem na branch `codex/pinball`.
 
 ## Capturas nativas
 
 ![Mesa em jogo](preview_pinball.png)
 
-![Menu inicial](preview_pinball_menu.png)
+![Menu](preview_pinball_menu.png)
+
+![Mesa pronta](preview_pinball_ready.png)
+
+![Fim de partida](preview_pinball_gameover.png)

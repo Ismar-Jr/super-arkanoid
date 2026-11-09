@@ -45,9 +45,11 @@ func _draw() -> void:
 		# Simula a queda dos fragmentos.
 		point.y += age * age * 45.0
 
-		draw_rect(Rect2(point.round(), Vector2(4, 2) if large else Vector2(2, 2)), Color(tint, fade))
+		draw_line(point, point - direction * (6 if large else 3), Color(tint, fade), 2, true)
+		draw_circle(point, 1.5 if large else 1.0, Color.WHITE * Color(1, 1, 1, fade), true, -1, true)
 
 	# Desenha um brilho breve no centro do impacto.
 	if age < 0.09:
-		draw_line(Vector2(-6, 0), Vector2(6, 0), Color(tint, fade), 2)
-		draw_line(Vector2(0, -6), Vector2(0, 6), Color(tint, fade), 2)
+		draw_circle(Vector2.ZERO, 12, Color(tint, fade * 0.15), true, -1, true)
+		draw_line(Vector2(-6, 0), Vector2(6, 0), Color(tint, fade), 2, true)
+		draw_line(Vector2(0, -6), Vector2(0, 6), Color(tint, fade), 2, true)

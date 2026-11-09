@@ -1,6 +1,6 @@
 [gd_scene format=3]
 [ext_resource type="Script" path="res://Scripts/Pinball/table.gd" id="1"]
-[ext_resource type="Texture2D" path="res://Assets/Pinball/playfield.png" id="2"]
+[ext_resource type="Texture2D" path="res://Assets/Pinball/playfield.svg" id="2"]
 [ext_resource type="PackedScene" path="res://Scenes/Pinball/ball.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://Scenes/Pinball/flipper.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://Scenes/Pinball/bumper.tscn" id="5"]
@@ -10,41 +10,44 @@
 size = Vector2(680, 30)
 [node name="Pinball" type="Node2D"]
 [node name="Table" type="Node2D" parent="."]
-position = Vector2(24, 64)
+position = Vector2(40, 160)
 script = ExtResource("1")
 [node name="Background" type="Sprite2D" parent="Table"]
 z_index = -2
 texture = ExtResource("2")
 centered = false
 [node name="Ball" parent="Table" instance=ExtResource("3")]
-position = Vector2(590, 426)
+position = Vector2(590, 846)
 z_index = 4
 [node name="LeftFlipper" parent="Table" instance=ExtResource("4")]
-position = Vector2(208, 405)
+position = Vector2(208, 825)
 z_index = 2
 [node name="RightFlipper" parent="Table" instance=ExtResource("4")]
-position = Vector2(412, 405)
+position = Vector2(412, 825)
 z_index = 2
 right_side = true
 [node name="BumperLeft" parent="Table" instance=ExtResource("5")]
-position = Vector2(235, 146)
+position = Vector2(240, 245)
 [node name="BumperRight" parent="Table" instance=ExtResource("5")]
-position = Vector2(385, 146)
+position = Vector2(380, 245)
 tint = Color(1, 0.78, 0.45, 1)
 [node name="BumperCore" parent="Table" instance=ExtResource("5")]
-position = Vector2(310, 227)
+position = Vector2(310, 345)
 tint = Color(1, 0.55, 0.8, 1)
 [node name="TargetLeft" parent="Table" instance=ExtResource("6")]
-position = Vector2(235, 70)
+position = Vector2(124, 390)
+rotation = 1.5707964
 target_id = 0
 [node name="TargetCenter" parent="Table" instance=ExtResource("6")]
-position = Vector2(310, 70)
+position = Vector2(124, 438)
+rotation = 1.5707964
 target_id = 1
 [node name="TargetRight" parent="Table" instance=ExtResource("6")]
-position = Vector2(385, 70)
+position = Vector2(124, 486)
+rotation = 1.5707964
 target_id = 2
 [node name="Drain" type="Area2D" parent="Table"]
-position = Vector2(320, 493)
+position = Vector2(320, 913)
 collision_layer = 1024
 collision_mask = 128
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Table/Drain"]

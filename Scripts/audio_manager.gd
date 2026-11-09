@@ -8,7 +8,7 @@ signal music_changed(track: AudioStream)
 
 # Músicas e efeitos sonoros disponíveis.
 const MENU_MUSIC: AudioStream = preload("res://Audio/Music/Stranger Things - Causmic.mp3")
-const GAME_MUSIC: AudioStream = preload("res://Audio/Music/Creep - Emmit Fenn.mp3")
+const GAME_MUSIC: AudioStream = preload("res://Audio/Music/GTA Type Beat - Dyalla.mp3")
 const MAX_VOICES := 16
 
 const SOUNDS := {
@@ -17,7 +17,7 @@ const SOUNDS := {
 	&"laser": preload("res://Audio/SFX/laser.wav"),
 	&"coleta": preload("res://Audio/SFX/coleta.wav"),
 	&"vida": preload("res://Audio/SFX/2-game-over-mario.mp3"),
-	&"game_over": preload("res://Audio/SFX/you-lose-you-lose.mp3"),
+	&"game_over": preload("res://Audio/SFX/wa-wa-wa-waaaaaaa.mp3"),
 	&"iniciar": preload("res://Audio/SFX/iniciar.wav"),
 	&"setor": preload("res://Audio/SFX/setor.wav"),
 	&"ui_move": preload("res://Audio/SFX/gta-sa-menu.mp3"),

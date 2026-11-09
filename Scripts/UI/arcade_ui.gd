@@ -3,13 +3,13 @@ extends RefCounted
 class_name ArcadeUI
 
 # Fonte e paleta de cores da interface.
-const FONT = preload("res://Assets/16bit/arcade.fnt")
-const INK = Color("090f22")
-const PANEL = Color("111b35")
-const CYAN = Color("72e8df")
-const AMBER = Color("ffcb76")
-const WHITE = Color("dce9f2")
-const MUTED = Color("8397b5")
+static var FONT: Font = ThemeDB.fallback_font
+const INK = Color("091019")
+const PANEL = Color("111c29")
+const CYAN = Color("74dfcb")
+const AMBER = Color("e6bd79")
+const WHITE = Color("f1e8d5")
+const MUTED = Color("8c9aa4")
 
 
 # Cria textos padronizados sem bloquear o mouse.
@@ -28,7 +28,7 @@ static func label(parent: Node, value: String, rect: Rect2, size: int = 16, colo
 	return result
 
 
-# Cria imagens com proporção preservada e pixels nítidos.
+# Preserva a proporção dos elementos gráficos, com suavização na escala.
 static func texture(parent: Node, path: String, rect: Rect2) -> TextureRect:
 	var result = TextureRect.new()
 	result.texture = load(path)
@@ -36,7 +36,7 @@ static func texture(parent: Node, path: String, rect: Rect2) -> TextureRect:
 	result.size = rect.size
 	result.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	result.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	result.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	result.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	result.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	parent.add_child(result)
 	return result
@@ -48,10 +48,11 @@ static func box_style(fill: Color, border: Color, thickness: int = 1) -> StyleBo
 	result.bg_color = fill
 	result.border_color = border
 	result.set_border_width_all(thickness)
-	result.border_width_bottom = thickness + 2
+	result.border_width_bottom = thickness
+	result.set_corner_radius_all(8)
 	result.shadow_color = Color(0.015, 0.025, 0.055, 0.7)
-	result.shadow_size = 4
-	result.shadow_offset = Vector2(0, 4)
+	result.shadow_size = 8
+	result.shadow_offset = Vector2(0, 5)
 	return result
 
 
@@ -87,21 +88,22 @@ static func button(parent: Node, value: String, rect: Rect2) -> Button:
 
 	# Configura fonte e cores dos estados do botão.
 	result.add_theme_font_override("font", FONT)
-	result.add_theme_font_size_override("font_size", 16)
+	result.add_theme_font_size_override("font_size", 18)
 	result.add_theme_color_override("font_color", WHITE)
 	result.add_theme_color_override("font_hover_color", CYAN)
 	result.add_theme_color_override("font_focus_color", CYAN)
 	result.add_theme_color_override("font_pressed_color", AMBER)
 
 	# Define os estilos normal, destacado e pressionado.
-	result.add_theme_stylebox_override("normal", box_style(Color("18243f"), Color("475a7d")))
-	result.add_theme_stylebox_override("hover", box_style(Color("213851"), CYAN, 2))
-	result.add_theme_stylebox_override("pressed", box_style(Color("30404e"), AMBER, 2))
+	result.add_theme_stylebox_override("normal", box_style(Color("172330"), Color("9b8159")))
+	result.add_theme_stylebox_override("hover", box_style(Color("243743"), AMBER, 2))
+	result.add_theme_stylebox_override("pressed", box_style(Color("3c3a32"), AMBER, 2))
 
 	# Destaca o botão selecionado pelo teclado ou mouse.
 	var focus = StyleBoxFlat.new()
 	focus.bg_color = Color.TRANSPARENT
-	focus.border_color = CYAN
+	focus.border_color = AMBER
+	focus.set_corner_radius_all(8)
 	focus.set_border_width_all(2)
 	result.add_theme_stylebox_override("focus", focus)
 
